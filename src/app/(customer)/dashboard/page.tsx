@@ -93,7 +93,7 @@ export default async function CustomerDashboardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {bookings.map((b) => (
+              {bookings.map((b: any) => (
                 <div key={b.id} className="card-luxury p-6 sm:p-8 space-y-6">
                   {/* Top Reference & Status */}
                   <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-brand-warm-200">

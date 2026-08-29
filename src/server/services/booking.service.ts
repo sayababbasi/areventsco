@@ -76,7 +76,7 @@ export class BookingService {
     const invoiceCount = await prisma.invoice.count();
     const invoiceNumber = generateInvoiceNumber(invoiceCount + 1);
 
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: any) => {
       // Create Booking record
       const createdBooking = await tx.booking.create({
         data: {
@@ -218,7 +218,7 @@ export class BookingService {
       throw new Error("Booking not found");
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const res = await tx.booking.update({
         where: { id: bookingId },
         data: {

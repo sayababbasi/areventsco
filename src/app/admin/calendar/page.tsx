@@ -29,7 +29,7 @@ export default async function AdminCalendarPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {bookings.map((b) => (
+        {bookings.map((b: any) => (
           <div key={b.id} className="card-luxury p-6 space-y-4 border-l-4 border-l-brand-gold-500">
             <div className="flex items-center justify-between pb-2 border-b border-brand-warm-200">
               <span className="font-mono font-bold text-xs text-brand-navy-900">

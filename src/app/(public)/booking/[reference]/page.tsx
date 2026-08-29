@@ -196,7 +196,7 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
 
               {/* Line items snapshot */}
               <div className="space-y-2.5 text-xs">
-                {booking.items.map((item) => (
+                {booking.items.map((item: any) => (
                   <div key={item.id} className="flex justify-between items-start pb-2 border-b border-brand-warm-100">
                     <div>
                       <p className="font-semibold text-brand-navy-900">{item.name}</p>

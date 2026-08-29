@@ -152,7 +152,7 @@ export default async function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-warm-200">
-              {recentBookings.map((b) => (
+              {recentBookings.map((b: any) => (
                 <tr key={b.id} className="hover:bg-brand-warm-50 transition-colors">
                   <td className="p-4 font-mono font-bold text-brand-navy-950">{b.reference}</td>
                   <td className="p-4">

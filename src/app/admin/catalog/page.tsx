@@ -34,7 +34,7 @@ export default async function AdminCatalogPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {packages.map((p) => (
+          {packages.map((p: any) => (
             <div key={p.id} className="card-luxury p-5 flex items-start space-x-4">
               {p.featuredImage && (
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
@@ -66,7 +66,7 @@ export default async function AdminCatalogPage() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {themes.map((t) => (
+          {themes.map((t: any) => (
             <div key={t.id} className="card-luxury p-4 space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-brand-navy-950">{t.title}</h3>
@@ -84,7 +84,7 @@ export default async function AdminCatalogPage() {
         <div className="space-y-4">
           <h2 className="text-lg font-bold font-serif text-brand-navy-950">Add-ons & Entertainment</h2>
           <div className="space-y-2">
-            {addons.map((a) => (
+            {addons.map((a: any) => (
               <div key={a.id} className="card-luxury p-3.5 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-bold text-brand-navy-950">{a.title}</p>
@@ -100,7 +100,7 @@ export default async function AdminCatalogPage() {
         <div className="space-y-4">
           <h2 className="text-lg font-bold font-serif text-brand-navy-950">Twin Cities Partner Venues</h2>
           <div className="space-y-2">
-            {venues.map((v) => (
+            {venues.map((v: any) => (
               <div key={v.id} className="card-luxury p-3.5 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-bold text-brand-navy-950">{v.name}</p>
