@@ -1,149 +1,239 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, CheckCircle2, ChevronRight, Eye, Calendar } from "lucide-react";
+import { formatPKR } from "@/lib/utils";
 
 export const metadata = {
-  title: "Birthday Themes & 3D Backdrops Islamabad & Rawalpindi | AR Events Co.",
-  description: "Explore curated birthday themes in Islamabad and Rawalpindi: Royal Navy & Gold, Princess Castle, Wild Safari, Galaxy Space, and Boho Pampas.",
+  title: "Birthday Decoration Themes & 3D Backdrops Islamabad & Rawalpindi | AR Events Co.",
+  description: "Browse 8 authentic birthday decoration themes in Islamabad & Rawalpindi: Lavender Dream, Golden Sunflower, Dusty Rose Bunny, Vintage Racer, Jungle Safari, and Royal Prince.",
 };
 
 const allThemes = [
   {
-    slug: "royal-navy-gold",
-    title: "Royal Navy & Metallic Gold",
-    category: "Adult Luxury & Milestones",
-    description: "Our signature luxury theme featuring deep midnight blues, metallic chrome gold balloons, bespoke illuminated acrylic typography, and giant marquee numbers.",
-    colorPalette: ["#0A192F", "#D4AF37", "#1B365D", "#F4F4F0"],
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Chrome gold & navy organic balloon arch", "3D Acrylic monogram", "Vintage marquee numbers", "Warm evening uplighting"],
+    slug: "lavender-dream-princess",
+    title: "Lavender Dream & Purple Princess",
+    category: "Girls",
+    startingPriceMinor: 4500000,
+    ageSuitability: "1st to 10th Birthdays",
+    description: "Circular lilac backdrop board with personalized 3D cursive lettering, organic lavender, deep violet & pearl white balloon garland, and fluted cake pedestals.",
+    colorPalette: ["#9370DB", "#E6E6FA", "#4B0082", "#FFFFFF"],
+    image: "/images/themes/theme_lavender_dream.jpg",
+    highlights: ["8ft Round lilac backdrop", "14ft Organic balloon garland", "2 White fluted pedestals", "Floral floor runner"],
   },
   {
-    slug: "enchanted-princess-castle",
-    title: "Enchanted Princess Castle",
-    category: "Kids Fairytale",
-    description: "A fairytale wonderland with soft pastel pinks, gold turrets, royal crown pedestals, and whimsical floral balloon clouds crafted for little princesses.",
-    colorPalette: ["#FCE7F3", "#D4AF37", "#F472B6", "#FFFFFF"],
-    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Castle facade backdrop", "Pastel balloon cloud arches", "Royal carriage cutout", "Crown pedestal table"],
+    slug: "sunflower-golden-sunshine",
+    title: "Golden Sunflower Sunshine",
+    category: "Floral",
+    startingPriceMinor: 4800000,
+    ageSuitability: "1st to 12th Birthdays",
+    description: "Warm rustic-chic wooden panel backdrop with illuminated neon 'Happy Birthday' lighting, cascading sunny yellow balloon arch, and blooming fresh sunflowers.",
+    colorPalette: ["#FFD700", "#FFF8DC", "#8B4513", "#228B22"],
+    image: "/images/themes/theme_sunflower_sunshine.jpg",
+    highlights: ["Natural wooden slat backdrop", "Neon 'Happy Birthday' sign", "Giant 3D wooden ONE letters", "Rustic crates & sunflower pots"],
   },
   {
-    slug: "wild-safari-adventure",
-    title: "Wild One Safari Adventure",
-    category: "Kids Jungle Theme",
-    description: "Lush tropical palm greenery, animal prints, wooden rustic crates, and life-size giraffe/lion cutouts perfect for 1st to 5th birthdays.",
-    colorPalette: ["#064E3B", "#D97706", "#78350F", "#ECFDF5"],
-    image: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Life-sized safari animal cutouts", "Tropical balloon installation", "Wooden barrel plinths", "Safari Jeep photo booth"],
+    slug: "enchanted-dusty-rose-bunny",
+    title: "Enchanted Dusty Rose Bunny",
+    category: "First Birthday",
+    startingPriceMinor: 5500000,
+    ageSuitability: "1st to 3rd Birthdays",
+    description: "Botanical garden meadow setup with arched dusty rose velvet backdrop, fresh pastel floral garden bed, and a storybook illustrated Peter Rabbit cutout.",
+    colorPalette: ["#C08081", "#FFE4E1", "#DDA0DD", "#FFFFFF"],
+    image: "/images/themes/theme_dusty_rose_bunny.jpg",
+    highlights: ["Dusty rose velvet arch panel", "Fresh rose & hydrangea meadow bed", "Peter Rabbit cutout", "Pastel entryway balloon arch"],
   },
   {
-    slug: "astronaut-galaxy-odyssey",
-    title: "Astronaut Galaxy Odyssey",
-    category: "Kids Space Quest",
-    description: "Cosmic space journey featuring deep celestial backdrops, glowing planet balloons, spaceship cutouts, and LED starfield ambient projections.",
-    colorPalette: ["#0F172A", "#38BDF8", "#818CF8", "#F1F5F9"],
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Rocket ship 3D cutout", "Floating planet balloons", "Star projector lighting", "Astronaut helmet photobooth"],
+    slug: "vintage-little-racer",
+    title: "Vintage Little Racer (Beep Beep)",
+    category: "Boys",
+    startingPriceMinor: 5000000,
+    ageSuitability: "1st & 2nd Birthdays",
+    description: "Retro roadster theme with 'Beep Beep! I'm ONE!' backdrop, bold balloon clusters in cherry red, olive, and mustard, black & white checkered runner, and 3D ONE car block letters.",
+    colorPalette: ["#DC2626", "#4B5320", "#EAB308", "#38BDF8"],
+    image: "/images/themes/theme_vintage_racer.jpg",
+    highlights: ["Beep Beep custom backdrop", "Multicolor balloon cluster garland", "Checkered tabletop runner", "3D ONE car block letters"],
   },
   {
-    slug: "boho-pampas-rose-gold",
-    title: "Boho Pampas & Rose Gold",
-    category: "Milestone & Chic",
-    description: "Earthy neutrals, natural dried pampas grass, macrame details, and warm rose gold accents for trendy young adult celebrations.",
-    colorPalette: ["#FDE047", "#FBCFE8", "#D97706", "#FEF3C7"],
-    image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Hexagonal wooden arch", "Natural pampas grass florals", "Double-stuffed matte balloons", "Custom calligraphy sign"],
+    slug: "jungle-safari-kingdom",
+    title: "Jungle Safari Kingdom",
+    category: "Kids",
+    startingPriceMinor: 5200000,
+    ageSuitability: "1st to 7th Birthdays",
+    description: "Grand circular balloon hoop of forest sage green, metallic gold, and tan balloons, lush tropical monstera foliage, 3 white plinths, and plush lifelike safari animals.",
+    colorPalette: ["#2D5A27", "#D4AF37", "#D2B48C", "#0F172A"],
+    image: "/images/themes/theme_jungle_safari.jpg",
+    highlights: ["8ft Circular balloon hoop", "Tropical palm & monstera foliage", "Set of 3 white cylinder plinths", "Plush safari animals (Lion, Giraffe, Monkey)"],
   },
   {
-    slug: "dinosaur-jurassic-discovery",
-    title: "Jurassic Dinosaur Discovery",
-    category: "Kids Adventure",
-    description: "Prehistoric adventure featuring towering T-Rex cutouts, tropical volcano backdrops, earth-tone balloon trees, and dinosaur footprint trail decor.",
-    colorPalette: ["#14532D", "#854D0E", "#A16207", "#FEF08A"],
-    image: "https://images.unsplash.com/photo-1569317002804-ab77bcf1bce4?auto=format&fit=crop&w=800&q=80",
-    highlights: ["Giant dinosaur cutouts", "Volcano backdrop setup", "Fossil excavation favor table", "Jungle vine balloon garlands"],
+    slug: "pastel-butterfly-wonderland",
+    title: "Pastel Butterfly Wonderland",
+    category: "Girls",
+    startingPriceMinor: 4800000,
+    ageSuitability: "1st to 8th Birthdays",
+    description: "Dreamy arched lavender backdrop with fluttering 3D glitter butterflies, soft pink & lilac balloon cascade, fluted metallic pedestal, and fresh garden flower baskets.",
+    colorPalette: ["#D8B4E2", "#FCE7F3", "#B89037", "#FFFFFF"],
+    image: "/images/themes/theme_butterfly_wonderland.jpg",
+    highlights: ["Arched lilac backdrop board", "3D Flutter butterflies cascade", "Fluted metallic cake plinth", "Illuminated marquee LED number '1'"],
+  },
+  {
+    slug: "speed-champion-racing-two",
+    title: "Speed Champion (Racing to Two)",
+    category: "Boys",
+    startingPriceMinor: 5200000,
+    ageSuitability: "2nd to 8th Birthdays",
+    description: "High-octane Formula 1 setup with racing red and black balloon arches, checkered foil balloons, race track backdrop, F1 tire stacks, trophy display, and giant illuminated number 2.",
+    colorPalette: ["#EF4444", "#000000", "#FFFFFF", "#F59E0B"],
+    image: "/images/themes/theme_speed_champion.jpg",
+    highlights: ["Racetrack graphic backdrop", "Red & black checkered balloon arch", "Illuminated marquee number '2'", "Checkered trophy pedestal"],
+  },
+  {
+    slug: "royal-midnight-prince",
+    title: "Royal Midnight Prince & Gold",
+    category: "Luxury",
+    startingPriceMinor: 6500000,
+    ageSuitability: "1st Birthdays & Milestone Adult Celebrations",
+    description: "Regal midnight navy and mirror gold setup with gold illuminated royal crown backdrop, massive chrome balloon installation, 3 gold mirror plinths, and royal floor decal.",
+    colorPalette: ["#0A192F", "#D4AF37", "#1E3A8A", "#FFFFFF"],
+    image: "/images/themes/theme_royal_midnight_prince.jpg",
+    highlights: ["Navy royal crest backdrop", "Illuminated neon crown motif", "Midnight navy & chrome gold balloon arch", "3 Gold mirror cylindrical plinths"],
   },
 ];
 
 export default function ThemesPage() {
   return (
     <div className="py-12 sm:py-16 space-y-16">
+      {/* 1. PAGE HEADER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-        <span className="badge-gold uppercase tracking-wider text-xs">Visual Concepts</span>
-        <h1 className="text-4xl sm:text-5xl font-serif text-brand-navy-950">
-          Birthday Themes & Backdrops
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-gold-50 border border-brand-gold-300 text-brand-gold-800 text-xs font-semibold tracking-wide uppercase">
+          <Sparkles className="w-3.5 h-3.5 text-brand-gold-600" />
+          <span>Bespoke Event Styling Catalog</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-serif text-brand-navy-950 font-bold">
+          Birthday Decoration Themes
         </h1>
         <div className="gold-divider mx-auto" />
-        <p className="text-brand-navy-700 max-w-2xl mx-auto text-base sm:text-lg">
-          Each theme is bespoke, featuring custom color-matched balloon architecture, illuminated 3D backdrops, and photo-ready cake tables across Islamabad & Rawalpindi.
+        <p className="text-brand-navy-700 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+          Browse our original birthday themes designed and styled for private residences, farmhouses, garden lawns, and banquets across Islamabad & Rawalpindi.
         </p>
       </section>
 
+      {/* 2. THEMES GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {allThemes.map((theme) => (
-            <div key={theme.slug} className="card-luxury flex flex-col justify-between group">
+            <div key={theme.slug} className="card-luxury flex flex-col justify-between group overflow-hidden">
               <div>
-                <div className="relative h-60 w-full overflow-hidden">
+                {/* Theme Image with Category Badge */}
+                <div className="relative h-64 w-full overflow-hidden bg-brand-warm-100">
                   <Image
                     src={theme.image}
-                    alt={theme.title}
+                    alt={`${theme.title} birthday decoration in Islamabad`}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950/80 via-transparent to-transparent" />
-                  
-                  <div className="absolute top-4 left-4">
-                    <span className="badge-gold bg-brand-navy-950/90 text-brand-gold-300 border-brand-gold-400 text-xs">
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950/80 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                  <div className="absolute top-3.5 left-3.5 flex space-x-2">
+                    <span className="badge-gold bg-brand-navy-950/90 text-brand-gold-300 border-brand-gold-400 text-xs font-semibold shadow-sm">
                       {theme.category}
+                    </span>
+                    <span className="bg-white/95 text-brand-navy-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-sm">
+                      {theme.ageSuitability}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                    <div className="flex space-x-1.5 bg-brand-navy-950/80 p-1.5 rounded-lg border border-white/20">
-                      {theme.colorPalette.map((color, cIdx) => (
-                        <span
-                          key={cIdx}
-                          className="w-4 h-4 rounded-full border border-white/40 shadow-sm"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
+                  {/* Color Palette Indicators in bottom right */}
+                  <div className="absolute bottom-3 right-3 flex items-center space-x-1.5 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/20">
+                    {theme.colorPalette.map((c, i) => (
+                      <span
+                        key={i}
+                        className="w-3.5 h-3.5 rounded-full border border-white/60 inline-block"
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
                   </div>
                 </div>
 
+                {/* Card Body */}
                 <div className="p-6 space-y-4">
-                  <h3 className="text-xl font-bold font-serif text-brand-navy-950">
-                    {theme.title}
-                  </h3>
-                  <p className="text-xs text-brand-navy-700 leading-relaxed">
-                    {theme.description}
-                  </p>
-
-                  <div className="space-y-2 pt-2 border-t border-brand-warm-200">
-                    <p className="text-[11px] font-bold text-brand-navy-900 uppercase tracking-wider flex items-center">
-                      <Sparkles className="w-3 h-3 text-brand-gold-500 mr-1" />
-                      Key Features:
+                  <div className="space-y-1">
+                    <h3 className="font-serif text-xl font-bold text-brand-navy-950 group-hover:text-brand-gold-700 transition-colors">
+                      {theme.title}
+                    </h3>
+                    <p className="text-xs text-brand-navy-600 line-clamp-2 leading-relaxed">
+                      {theme.description}
                     </p>
-                    <ul className="space-y-1 text-xs text-brand-navy-600">
-                      {theme.highlights.map((h, i) => (
-                        <li key={i}>• {h}</li>
-                      ))}
-                    </ul>
+                  </div>
+
+                  {/* Setup Highlights */}
+                  <div className="space-y-1.5 pt-2 border-t border-brand-warm-100">
+                    {theme.highlights.slice(0, 3).map((hl, idx) => (
+                      <div key={idx} className="flex items-center space-x-2 text-xs text-brand-navy-800">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold-600 shrink-0" />
+                        <span className="truncate">{hl}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 pt-0 border-t border-brand-warm-100">
-                <Link
-                  href={`/book?theme=${encodeURIComponent(theme.title)}`}
-                  className="btn-gold w-full py-2.5 text-xs flex items-center justify-center space-x-1.5"
-                >
-                  <span>Select & Book This Theme</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+              {/* Card Footer with Pricing & Dual CTAs */}
+              <div className="p-6 pt-0 space-y-3">
+                <div className="flex items-baseline justify-between pt-3 border-t border-brand-warm-200">
+                  <span className="text-xs text-brand-navy-500 font-medium">Starting from</span>
+                  <span className="text-lg font-bold font-serif text-brand-navy-950">
+                    {formatPKR(theme.startingPriceMinor)}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <Link
+                    href={`/themes/${theme.slug}`}
+                    className="py-2.5 px-3 rounded-xl border border-brand-warm-300 text-brand-navy-900 text-xs font-semibold hover:bg-brand-warm-100 text-center flex items-center justify-center space-x-1 transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>View Setup</span>
+                  </Link>
+
+                  <Link
+                    href={`/book?theme=${theme.slug}`}
+                    className="btn-gold py-2.5 px-3 text-xs font-semibold text-center flex items-center justify-center space-x-1 shadow-sm"
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Book Theme</span>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 3. CUSTOM THEME INQUIRY BANNER */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-8 sm:p-12 rounded-3xl bg-brand-navy-950 text-white relative overflow-hidden border border-brand-gold-300/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-3 text-center lg:text-left">
+              <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold-400">
+                Have a Specific Theme or Character in Mind?
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white">
+                Bespoke Theme Customization for Your Event
+              </h2>
+              <p className="text-sm text-brand-navy-200 max-w-2xl leading-relaxed">
+                If you have a customized concept, specific cartoon characters, unique color palettes, or Pinterest inspiration, our design studio crafts custom acrylic backdrops and balloon sculptures for your celebration.
+              </p>
+            </div>
+            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
+              <Link href="/book" className="btn-gold py-3.5 text-center text-sm font-semibold">
+                Request Custom Design
+              </Link>
+              <Link href="/contact" className="py-3 px-4 rounded-xl border border-white/20 text-white text-sm font-medium hover:bg-white/10 text-center transition-colors">
+                Talk to Decor Lead
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -44,8 +44,8 @@ export default function BookingPage() {
   const [endTime, setEndTime] = useState("22:00");
   const [guestCount, setGuestCount] = useState(35);
 
-  const [selectedPackageId, setSelectedPackageId] = useState("grand-royal-celebration");
-  const [selectedThemeTitle, setSelectedThemeTitle] = useState("Royal Navy & Metallic Gold");
+  const [selectedPackageId, setSelectedPackageId] = useState("kids-wonderland-birthday");
+  const [selectedThemeTitle, setSelectedThemeTitle] = useState("Lavender Dream & Purple Princess");
   const [selectedVenueId, setSelectedVenueId] = useState("private-residence-venue");
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([
     "pro-photography-3hr",
@@ -61,55 +61,91 @@ export default function BookingPage() {
   // Catalog Options
   const packages = [
     {
-      id: "grand-royal-celebration",
-      title: "Grand Royal Celebration",
-      subtitle: "Our signature luxury all-inclusive birthday experience",
-      priceMinor: 12500000,
-      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80",
-    },
-    {
       id: "kids-wonderland-birthday",
       title: "Kids Wonderland Experience",
       subtitle: "Magical birthday wonderland for children",
       priceMinor: 7500000,
-      image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80",
+      image: "/images/themes/theme_dusty_rose_bunny.jpg",
+    },
+    {
+      id: "grand-royal-celebration",
+      title: "Grand Royal Celebration",
+      subtitle: "Our signature luxury all-inclusive birthday experience",
+      priceMinor: 12500000,
+      image: "/images/themes/theme_royal_midnight_prince.jpg",
     },
     {
       id: "elegant-chic-milestone",
       title: "Elegant Chic Milestone",
       subtitle: "Minimalist luxury with marquee numbers for teens & adults",
       priceMinor: 9500000,
-      image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=600&q=80",
+      image: "/images/themes/theme_sunflower_sunshine.jpg",
     },
     {
       id: "pastel-dream-intimate",
       title: "Pastel Dream Intimate",
       subtitle: "Chic modern setup for home lounge celebrations",
       priceMinor: 4500000,
-      image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=600&q=80",
+      image: "/images/themes/theme_lavender_dream.jpg",
     },
   ];
 
   const themes = [
     {
-      title: "Royal Navy & Metallic Gold",
-      colors: ["#0A192F", "#D4AF37", "#1B365D"],
+      slug: "lavender-dream-princess",
+      title: "Lavender Dream & Purple Princess",
+      category: "Girls",
+      image: "/images/themes/theme_lavender_dream.jpg",
+      colors: ["#9370DB", "#E6E6FA", "#4B0082"],
     },
     {
-      title: "Enchanted Princess Castle",
-      colors: ["#FCE7F3", "#D4AF37", "#F472B6"],
+      slug: "sunflower-golden-sunshine",
+      title: "Golden Sunflower Sunshine",
+      category: "Floral",
+      image: "/images/themes/theme_sunflower_sunshine.jpg",
+      colors: ["#FFD700", "#FFF8DC", "#8B4513"],
     },
     {
-      title: "Wild One Safari Adventure",
-      colors: ["#064E3B", "#D97706", "#78350F"],
+      slug: "enchanted-dusty-rose-bunny",
+      title: "Enchanted Dusty Rose Bunny",
+      category: "First Birthday",
+      image: "/images/themes/theme_dusty_rose_bunny.jpg",
+      colors: ["#C08081", "#FFE4E1", "#FFFFFF"],
     },
     {
-      title: "Astronaut Galaxy Odyssey",
-      colors: ["#0F172A", "#38BDF8", "#818CF8"],
+      slug: "vintage-little-racer",
+      title: "Vintage Little Racer (Beep Beep)",
+      category: "Boys",
+      image: "/images/themes/theme_vintage_racer.jpg",
+      colors: ["#DC2626", "#4B5320", "#38BDF8"],
     },
     {
-      title: "Boho Pampas & Rose Gold",
-      colors: ["#FDE047", "#FBCFE8", "#D97706"],
+      slug: "jungle-safari-kingdom",
+      title: "Jungle Safari Kingdom",
+      category: "Kids",
+      image: "/images/themes/theme_jungle_safari.jpg",
+      colors: ["#2D5A27", "#D4AF37", "#D2B48C"],
+    },
+    {
+      slug: "pastel-butterfly-wonderland",
+      title: "Pastel Butterfly Wonderland",
+      category: "Girls",
+      image: "/images/themes/theme_butterfly_wonderland.jpg",
+      colors: ["#D8B4E2", "#FCE7F3", "#B89037"],
+    },
+    {
+      slug: "speed-champion-racing-two",
+      title: "Speed Champion (Racing to Two)",
+      category: "Boys",
+      image: "/images/themes/theme_speed_champion.jpg",
+      colors: ["#EF4444", "#000000", "#F59E0B"],
+    },
+    {
+      slug: "royal-midnight-prince",
+      title: "Royal Midnight Prince & Gold",
+      category: "Luxury",
+      image: "/images/themes/theme_royal_midnight_prince.jpg",
+      colors: ["#0A192F", "#D4AF37", "#FFFFFF"],
     },
   ];
 
@@ -226,6 +262,26 @@ export default function BookingPage() {
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
+
+  // Read URL params to auto-select theme or package
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const themeParam = urlParams.get("theme");
+      const packageParam = urlParams.get("package");
+
+      if (packageParam && packages.some((p) => p.id === packageParam)) {
+        setSelectedPackageId(packageParam);
+      }
+
+      if (themeParam) {
+        const match = themes.find((t) => t.slug === themeParam);
+        if (match) {
+          setSelectedThemeTitle(match.title);
+        }
+      }
+    }
+  }, []);
 
   // Set default event date to 7 days ahead
   useEffect(() => {
