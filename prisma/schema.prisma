@@ -1,0 +1,447 @@
+// AR Events Co. - Prisma Database Schema
+// System of Record for Bookings, Catalog, CMS, Finance, RBAC, and Operations
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// 1. IDENTITY & ACCESS CONTROL (RBAC)
+// ----------------------------------------------------
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String
+  phone           String?
+  passwordHash    String
+  role            String           @default("CUSTOMER") // SUPER_ADMIN, ADMIN, EVENT_MANAGER, STAFF, CUSTOMER
+  isActive        Boolean          @default(true)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  customerProfile CustomerProfile?
+  staffProfile    StaffProfile?
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+}
+
+model CustomerProfile {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address         String?
+  city            String?          @default("Islamabad") // Islamabad or Rawalpindi
+  emergencyContact String?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  bookings        Booking[]
+  reviews         Review[]
+}
+
+model StaffProfile {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle        String           @default("Event Coordinator")
+  department      String           @default("Operations")
+  assignedTasks   String?          // JSON list of task descriptions
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  assignedBookings Booking[]
+}
+
+// ----------------------------------------------------
+// 2. CATALOG & INVENTORY (PACKAGES, THEMES, SERVICES)
+// ----------------------------------------------------
+
+model Package {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  subtitle        String?
+  description     String
+  basePriceMinor  Int              // In Paisa (e.g. 5000000 = PKR 50,000)
+  currency        String           @default("PKR")
+  guestCapacityMin Int             @default(10)
+  guestCapacityMax Int             @default(100)
+  estimatedDurationHours Int       @default(4)
+  featuredImage   String?
+  galleryImages   String?          // JSON array of URLs
+  features        String           // JSON array of included feature bullets
+  isFeatured      Boolean          @default(false)
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  bookings        Booking[]
+}
+
+model Theme {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  category        String           @default("Kids Birthday") // Kids Birthday, Adult Luxury, Milestone, Custom
+  description     String
+  colorPalette    String?          // JSON array of hex codes e.g. ["#0A192F", "#D4AF37"]
+  heroImage       String?
+  galleryImages   String?          // JSON array of URLs
+  includedDecor   String?          // JSON array of decor highlights
+  isPopular       Boolean          @default(false)
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  bookings        Booking[]
+}
+
+model Service {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  category        String           @default("Decoration") // Decoration, Photography, Entertainment, Catering, Cake
+  description     String
+  priceType       String           @default("FIXED") // FIXED, PER_GUEST, HOURLY, CUSTOM
+  basePriceMinor  Int              @default(0) // In Paisa
+  currency        String           @default("PKR")
+  image           String?
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Addon {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  category        String           @default("Addon") // Balloons, Backdrop, Cake, Lighting, Sound, Favors
+  description     String?
+  priceMinor      Int              // In Paisa
+  currency        String           @default("PKR")
+  image           String?
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Venue {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  name            String
+  city            String           @default("Islamabad") // Islamabad / Rawalpindi
+  address         String
+  capacity        Int              @default(100)
+  venueType       String           @default("Indoor Hall") // Indoor Hall, Garden/Outdoor, Private Villa, Rooftop
+  feeMinor        Int              @default(0) // In Paisa
+  currency        String           @default("PKR")
+  images          String?          // JSON array
+  description     String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  bookings        Booking[]
+}
+
+// ----------------------------------------------------
+// 3. BOOKING ENGINE & AVAILABILITY
+// ----------------------------------------------------
+
+model Booking {
+  id              String           @id @default(cuid())
+  reference       String           @unique // e.g. AR-2026-8942
+  customerId      String
+  customer        CustomerProfile  @relation(fields: [customerId], references: [id])
+  
+  // Event Scope
+  eventType       String           @default("Birthday") // Birthday, Anniversary, Corporate, Wedding
+  eventDate       DateTime
+  startTime       String           // e.g. "18:00"
+  endTime         String           // e.g. "22:00"
+  guestCount      Int              @default(30)
+  city            String           @default("Islamabad") // Islamabad or Rawalpindi
+  venueLocation   String           // Full address or venue name
+  
+  // Selected Relations (Optional)
+  packageId       String?
+  package         Package?         @relation(fields: [packageId], references: [id])
+  themeId         String?
+  theme           Theme?           @relation(fields: [themeId], references: [id])
+  venueId         String?
+  venue           Venue?           @relation(fields: [venueId], references: [id])
+  assignedStaffId String?
+  assignedStaff   StaffProfile?    @relation(fields: [assignedStaffId], references: [id])
+  
+  // Lifecycle State Machine
+  // INQUIRY -> PENDING -> QUOTED -> CONFIRMED -> PREPARING -> COMPLETED -> CLOSED (or CANCELLED / REJECTED)
+  status          String           @default("INQUIRY")
+  
+  // Pricing Snapshot (Minor Units - Paisa)
+  currency        String           @default("PKR")
+  basePriceMinor  Int              @default(0)
+  addonsTotalMinor Int             @default(0)
+  venueFeeMinor   Int              @default(0)
+  travelFeeMinor  Int              @default(0)
+  discountMinor   Int              @default(0)
+  taxMinor        Int              @default(0)
+  totalAmountMinor Int             @default(0)
+  depositRequiredMinor Int         @default(0)
+  amountPaidMinor Int              @default(0)
+  balanceDueMinor Int              @default(0)
+  
+  specialRequests String?
+  internalNotes   String?
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  items           BookingItem[]
+  payments        Payment[]
+  invoices        Invoice[]
+  notifications   Notification[]
+}
+
+model BookingItem {
+  id              String           @id @default(cuid())
+  bookingId       String
+  booking         Booking          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  itemType        String           // PACKAGE, THEME, SERVICE, ADDON, VENUE_FEE, TRAVEL_FEE, CUSTOM
+  itemId          String?
+  name            String
+  description     String?
+  unitPriceMinor  Int
+  quantity        Int              @default(1)
+  totalPriceMinor Int
+  currency        String           @default("PKR")
+  
+  createdAt       DateTime         @default(now())
+}
+
+model AvailabilitySlot {
+  id              String           @id @default(cuid())
+  date            DateTime
+  startTime       String           // "10:00"
+  endTime         String           // "14:00"
+  maxConcurrentEvents Int          @default(2)
+  bookedEventsCount   Int          @default(0)
+  isBlocked       Boolean          @default(false)
+  blockReason     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+// ----------------------------------------------------
+// 4. FINANCIALS & INVOICING
+// ----------------------------------------------------
+
+model Payment {
+  id              String           @id @default(cuid())
+  bookingId       String
+  booking         Booking          @relation(fields: [bookingId], references: [id])
+  
+  amountMinor     Int              // In Paisa
+  currency        String           @default("PKR")
+  paymentType     String           @default("DEPOSIT") // DEPOSIT, FULL, PARTIAL, REFUND
+  paymentMethod   String           @default("BANK_TRANSFER") // BANK_TRANSFER, CASH, JAZZCASH, EASYPAISA, CARD
+  status          String           @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, REFUNDED
+  
+  providerRef     String?          // External Transaction ID or Bank Reference
+  receiptImage    String?          // Bank transfer slip URL
+  notes           String?
+  paidAt          DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Invoice {
+  id              String           @id @default(cuid())
+  invoiceNumber   String           @unique // e.g. INV-2026-0042
+  bookingId       String
+  booking         Booking          @relation(fields: [bookingId], references: [id])
+  
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  customerAddress String?
+  
+  subtotalMinor   Int
+  discountMinor   Int              @default(0)
+  taxMinor        Int              @default(0)
+  totalAmountMinor Int
+  amountPaidMinor Int              @default(0)
+  balanceDueMinor Int              @default(0)
+  currency        String           @default("PKR")
+  
+  status          String           @default("UNPAID") // UNPAID, PARTIALLY_PAID, PAID, CANCELLED
+  dueDate         DateTime
+  paidAt          DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  items           InvoiceItem[]
+}
+
+model InvoiceItem {
+  id              String           @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice          @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  description     String
+  unitPriceMinor  Int
+  quantity        Int              @default(1)
+  totalPriceMinor Int
+  currency        String           @default("PKR")
+}
+
+model Coupon {
+  id              String           @id @default(cuid())
+  code            String           @unique
+  description     String?
+  discountType    String           @default("PERCENTAGE") // PERCENTAGE or FIXED
+  discountValue   Int              // 15 = 15% or 500000 = PKR 5,000 in Paisa
+  minOrderMinor   Int              @default(0)
+  maxUses         Int              @default(100)
+  usedCount       Int              @default(0)
+  startsAt        DateTime?
+  expiresAt       DateTime?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+}
+
+// ----------------------------------------------------
+// 5. CMS, SOCIAL PROOF & MEDIA
+// ----------------------------------------------------
+
+model Page {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean          @default(true)
+  publishedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  sections        Section[]
+}
+
+model Section {
+  id              String           @id @default(cuid())
+  pageId          String
+  page            Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  identifier      String           // e.g. "hero", "about_intro", "values"
+  title           String?
+  subtitle        String?
+  content         String?          // HTML or rich text JSON
+  mediaUrl        String?
+  ctaLabel        String?
+  ctaLink         String?
+  sortOrder       Int              @default(0)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Faq {
+  id              String           @id @default(cuid())
+  question        String
+  answer          String
+  category        String           @default("General") // General, Booking, Pricing, Customization, Islamabad & Rawalpindi
+  sortOrder       Int              @default(0)
+  isFeatured      Boolean          @default(false)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Review {
+  id              String           @id @default(cuid())
+  customerId      String?
+  customer        CustomerProfile? @relation(fields: [customerId], references: [id])
+  authorName      String
+  authorLocation  String           @default("Islamabad") // e.g. "F-7, Islamabad" or "Bahria Town, Rawalpindi"
+  rating          Int              @default(5)
+  eventTitle      String           @default("1st Birthday Celebration")
+  comment         String
+  authorAvatar    String?
+  isVerified      Boolean          @default(true)
+  isFeatured      Boolean          @default(true)
+  isActive        Boolean          @default(true)
+  sortOrder       Int              @default(0)
+  createdAt       DateTime         @default(now())
+}
+
+model MediaAsset {
+  id              String           @id @default(cuid())
+  title           String
+  altText         String?
+  caption         String?
+  url             String
+  thumbnailUrl    String?
+  category        String           @default("Gallery") // Gallery, Package, Theme, Venue, CMS
+  tags            String?          // Comma-separated or JSON tags
+  fileSize        Int?
+  mimeType        String?
+  width           Int?
+  height          Int?
+  isFeatured      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+}
+
+// ----------------------------------------------------
+// 6. COMMUNICATIONS, AUDIT & SYSTEM SETTINGS
+// ----------------------------------------------------
+
+model Notification {
+  id              String           @id @default(cuid())
+  userId          String?
+  user            User?            @relation(fields: [userId], references: [id])
+  bookingId       String?
+  booking         Booking?         @relation(fields: [bookingId], references: [id])
+  
+  title           String
+  message         String
+  channel         String           @default("IN_APP") // IN_APP, EMAIL, WHATSAPP, SMS
+  isRead          Boolean          @default(false)
+  status          String           @default("SENT") // PENDING, SENT, FAILED
+  providerRef     String?
+  createdAt       DateTime         @default(now())
+}
+
+model AuditLog {
+  id              String           @id @default(cuid())
+  userId          String?
+  user            User?            @relation(fields: [userId], references: [id])
+  action          String           // e.g. "BOOKING_CONFIRMED", "PRICE_OVERRIDE", "PACKAGE_UPDATED"
+  entityType      String           // "Booking", "Package", "Payment", "User"
+  entityId        String
+  details         String?          // JSON diff or metadata
+  ipAddress       String?
+  createdAt       DateTime         @default(now())
+}
+
+model Setting {
+  id              String           @id @default(cuid())
+  key             String           @unique
+  value           String
+  group           String           @default("general") // general, contact, pricing, notifications, seo
+  description     String?
+  isPublic        Boolean          @default(false)
+  updatedAt       DateTime         @updatedAt
+}

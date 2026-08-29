@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --surface-light: #FAFAF8;
+    --surface-warm: #F4F4F0;
+    --border-subtle: #E8E8E0;
+    --border-gold: rgba(184, 144, 55, 0.35);
+    --text-primary: #0A192F;
+    --text-secondary: #4A5568;
+    --text-muted: #718096;
+    --gold-primary: #B89037;
+    --gold-hover: #9F772A;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .font-serif-luxury {
+    font-family: 'Playfair Display', 'Cinzel', Georgia, serif;
+  }
+
+  h4, h5, h6, .font-brand-title {
+    font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Custom Luxury UI Utilities */
+@layer components {
+  .btn-gold {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all duration-300 rounded-lg shadow-gold bg-gradient-to-r from-brand-gold-600 via-brand-gold-500 to-brand-gold-600 hover:from-brand-gold-700 hover:to-brand-gold-500 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-navy {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all duration-300 rounded-lg shadow-subtle bg-brand-navy-900 hover:bg-brand-navy-800 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-outline-gold {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-all duration-300 bg-transparent border rounded-lg text-brand-gold-700 border-brand-gold-400 hover:bg-brand-gold-50 hover:border-brand-gold-600 hover:text-brand-gold-800 disabled:opacity-50;
+  }
+
+  .btn-outline-navy {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold transition-all duration-300 bg-transparent border rounded-lg text-brand-navy-900 border-brand-navy-300 hover:bg-brand-navy-50 hover:border-brand-navy-600 disabled:opacity-50;
+  }
+
+  .card-luxury {
+    @apply bg-white border rounded-xl border-brand-warm-200 shadow-card transition-all duration-300 hover:shadow-elevated hover:border-brand-gold-300;
+  }
+
+  .badge-gold {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-gold-100 text-brand-gold-800 border border-brand-gold-300;
+  }
+
+  .badge-navy {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-navy-100 text-brand-navy-900 border border-brand-navy-200;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .badge-pending {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200;
+  }
+
+  .badge-cancelled {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200;
+  }
+
+  .gold-divider {
+    @apply h-[2px] w-16 bg-gradient-to-r from-brand-gold-300 via-brand-gold-500 to-brand-gold-300 my-4;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAFAF8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8C385;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B89037;
+}
