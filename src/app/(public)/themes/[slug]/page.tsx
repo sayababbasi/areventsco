@@ -303,26 +303,102 @@ const STATIC_THEMES: Record<
 };
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const theme = STATIC_THEMES[params.slug];
+  const dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+  const theme = dbTheme
+    ? {
+        title: dbTheme.title,
+        description: dbTheme.description,
+        includedDecor: ["Full Custom Backdrop", "Organic Balloon Arch", "Cake Pedestals"],
+        startingPriceMinor: 4500000,
+      }
+    : STATIC_THEMES[params.slug];
+
   if (!theme) return { title: "Theme Not Found | AR Events Co." };
 
   return {
     title: `${theme.title} Birthday Decoration Setup Islamabad & Rawalpindi | AR Events Co.`,
-    description: `Book the ${theme.title} birthday theme in Islamabad & Rawalpindi. Includes ${theme.includedDecor[0]}, starting from ${formatPKR(theme.startingPriceMinor)}.`,
+    description: `Book the ${theme.title} birthday theme in Islamabad & Rawalpindi. Starting from ${formatPKR(theme.startingPriceMinor)}.`,
   };
 }
 
 export default async function ThemeDetailPage({ params }: { params: { slug: string } }) {
-  const theme = STATIC_THEMES[params.slug];
+  const dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+
+  let theme: any = null;
+
+  if (dbTheme) {
+    let colors: string[] = [];
+    try {
+      colors = JSON.parse(dbTheme.colorPalette || "[]");
+    } catch {
+      colors = ["#9370DB", "#E6E6FA", "#4B0082", "#FFFFFF"];
+    }
+
+    let inclusions: string[] = [];
+    try {
+      inclusions = JSON.parse(dbTheme.includedDecor || "[]");
+    } catch {
+      inclusions = [
+        "Bespoke 3D Theme Backdrop with Custom Age/Name Signage",
+        "14ft Organic Double-Stuffed Balloon Garland Installation",
+        "Set of 2 Fluted Cylindrical Cake Pedestals",
+        "On-Site Setup Supervisor & Dedicated Decor Crew",
+      ];
+    }
+
+    theme = {
+      slug: dbTheme.slug,
+      title: dbTheme.title,
+      category: dbTheme.category,
+      startingPriceMinor: 4500000,
+      ageSuitability: "1st to 12th Birthdays & Milestones",
+      description: dbTheme.description,
+      heroImage: dbTheme.heroImage || "/images/themes/theme_lavender_dream.jpg",
+      gallery: [
+        dbTheme.heroImage || "/images/themes/theme_lavender_dream.jpg",
+        "/images/hero/hero_birthday_lawn.jpg",
+      ],
+      colorPalette: colors,
+      colorNames: colors,
+      includedDecor: inclusions,
+      specifications: [
+        { label: "Backdrop Dimensions", value: "8ft Width x 8ft Height" },
+        { label: "Setup Space Required", value: "10ft Width x 8ft Depth" },
+        { label: "Setup Time", value: "2.5 - 3 Hours on-site" },
+        { label: "Recommended Setting", value: "Outdoor Lawn, Lounge, or Banquet Hall" },
+        { label: "Service Area", value: "Islamabad & Rawalpindi (All Sectors/Zones)" },
+      ],
+      idealFor: ["Luxury Birthday Parties", "1st Birthday Milestone Celebrations", "Twin Cities Home Lounges & Lawns"],
+    };
+  } else {
+    theme = STATIC_THEMES[params.slug];
+  }
 
   if (!theme) {
     notFound();
   }
 
   // Get other themes for related carousel
-  const otherThemes = Object.values(STATIC_THEMES)
-    .filter((t) => t.slug !== theme.slug)
-    .slice(0, 3);
+  const otherDbThemes = await prisma.theme.findMany({
+    where: { isActive: true, slug: { not: theme.slug } },
+    take: 3,
+  });
+
+  const otherThemes = otherDbThemes.length > 0
+    ? otherDbThemes.map((t) => ({
+        slug: t.slug,
+        title: t.title,
+        category: t.category,
+        image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
+        startingPriceMinor: 4500000,
+      }))
+    : Object.values(STATIC_THEMES).filter((t) => t.slug !== theme.slug).slice(0, 3).map((t) => ({
+        slug: t.slug,
+        title: t.title,
+        category: t.category,
+        image: t.heroImage,
+        startingPriceMinor: t.startingPriceMinor,
+      }));
 
   return (
     <div className="py-8 sm:py-12 space-y-16">

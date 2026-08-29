@@ -445,3 +445,73 @@ model Setting {
   isPublic        Boolean          @default(false)
   updatedAt       DateTime         @updatedAt
 }
+
+// ----------------------------------------------------
+// 7. INVENTORY, LEADS, EXPENSES & TEAMS
+// ----------------------------------------------------
+
+model InventoryItem {
+  id              String           @id @default(cuid())
+  sku             String           @unique // e.g. "PROP-ARCH-01", "BALL-LAV-01"
+  name            String
+  category        String           @default("Props") // Backdrops, Balloons, Props, Cake Stands, Furniture, Lighting, Equipment
+  image           String?
+  totalQuantity   Int              @default(1)
+  availableQuantity Int            @default(1)
+  condition       String           @default("Excellent") // Excellent, Good, Fair, Needs Repair
+  location        String           @default("Main Warehouse, Islamabad")
+  costMinor       Int              @default(0) // In Paisa
+  status          String           @default("AVAILABLE") // AVAILABLE, IN_USE, MAINTENANCE, RETIRED
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Inquiry {
+  id              String           @id @default(cuid())
+  name            String
+  email           String
+  phone           String
+  city            String           @default("Islamabad") // Islamabad or Rawalpindi
+  eventType       String           @default("Birthday")
+  preferredTheme  String?
+  budgetMinor     Int?             // Estimated budget in Paisa
+  eventDate       DateTime?
+  message         String
+  status          String           @default("NEW") // NEW, CONTACTED, QUOTED, CONVERTED, LOST, ARCHIVED
+  notes           String?
+  assignedTo      String?
+  convertedBookingId String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Expense {
+  id              String           @id @default(cuid())
+  title           String
+  category        String           @default("Decor Materials") // Decor Materials, Balloon Helium, Logistics, Staff Wages, Venue, Marketing, Miscellaneous
+  amountMinor     Int              // In Paisa
+  currency        String           @default("PKR")
+  date            DateTime         @default(now())
+  recipient       String?          // Vendor or staff name
+  paymentMethod   String           @default("CASH") // CASH, BANK_TRANSFER, JAZZCASH
+  reference       String?          // Receipt or invoice number
+  notes           String?
+  bookingId       String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Team {
+  id              String           @id @default(cuid())
+  name            String           @unique // e.g. "Alpha Decor Crew", "Islamabad West Team"
+  zone            String           @default("Islamabad") // Islamabad, Rawalpindi, All
+  leadStaffName   String?
+  leadPhone       String?
+  memberCount     Int              @default(3)
+  status          String           @default("ACTIVE") // ACTIVE, ON_LEAVE, DISBANDED
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+

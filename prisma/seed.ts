@@ -622,6 +622,167 @@ async function main() {
       maxUses: 200,
     },
   });
+  console.log("✅ Seed Coupons created successfully.");
+
+  // 11. CREATE INVENTORY ITEMS
+  const inventoryData = [
+    {
+      sku: "ARCH-LILAC-01",
+      name: "8ft Circular Lilac Wooden Backdrop Board",
+      category: "Backdrops",
+      image: "/images/themes/theme_lavender_dream.jpg",
+      totalQuantity: 2,
+      availableQuantity: 2,
+      condition: "Excellent",
+      location: "Islamabad Sector I-9 Warehouse",
+      costMinor: 4500000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "SLAT-WOOD-01",
+      name: "Tri-Fold Natural Slatted Wooden Screen Backdrop",
+      category: "Backdrops",
+      image: "/images/themes/theme_sunflower_sunshine.jpg",
+      totalQuantity: 2,
+      availableQuantity: 2,
+      condition: "Excellent",
+      location: "Islamabad Sector I-9 Warehouse",
+      costMinor: 5500000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "ARCH-DUSTY-01",
+      name: "Semicircular Dusty Rose Velvet Panel Arch",
+      category: "Backdrops",
+      image: "/images/themes/theme_dusty_rose_bunny.jpg",
+      totalQuantity: 2,
+      availableQuantity: 1,
+      condition: "Excellent",
+      location: "Islamabad Sector I-9 Warehouse",
+      costMinor: 6500000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "HOOP-JUNGLE-01",
+      name: "8ft Freestanding Gold Circular Balloon Hoop",
+      category: "Backdrops",
+      image: "/images/themes/theme_jungle_safari.jpg",
+      totalQuantity: 3,
+      availableQuantity: 3,
+      condition: "Excellent",
+      location: "Islamabad Sector I-9 Warehouse",
+      costMinor: 3500000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "NEON-HBD-01",
+      name: "Warm White Neon 'Happy Birthday' Sign",
+      category: "Lighting",
+      totalQuantity: 4,
+      availableQuantity: 3,
+      condition: "Excellent",
+      location: "Tech Storage Room A",
+      costMinor: 1800000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "MARQ-ONE-01",
+      name: "Giant 4ft 3D Wooden 'ONE' Marquee Letters",
+      category: "Props",
+      totalQuantity: 3,
+      availableQuantity: 2,
+      condition: "Excellent",
+      location: "Prop Room B",
+      costMinor: 3000000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "PLINTH-WHITE-01",
+      name: "Glossy White Fluted Cylinder Plinths (Set of 3)",
+      category: "Cake Stands",
+      totalQuantity: 6,
+      availableQuantity: 5,
+      condition: "Excellent",
+      location: "Furniture Storage",
+      costMinor: 2800000,
+      status: "AVAILABLE",
+    },
+    {
+      sku: "PLINTH-GOLD-01",
+      name: "Mirror Finish Chrome Gold Cake Pedestals (Set of 3)",
+      category: "Cake Stands",
+      totalQuantity: 3,
+      availableQuantity: 3,
+      condition: "Excellent",
+      location: "Luxury Vault",
+      costMinor: 4800000,
+      status: "AVAILABLE",
+    },
+  ];
+
+  for (const inv of inventoryData) {
+    await prisma.inventoryItem.create({ data: inv });
+  }
+  console.log("✅ Seed Inventory Items created successfully.");
+
+  // 12. CREATE TEAMS
+  const teamsData = [
+    {
+      name: "Alpha Decor Crew (Islamabad West)",
+      zone: "Islamabad",
+      leadStaffName: "Hamza Ali",
+      leadPhone: "+92 300 8941234",
+      memberCount: 4,
+      status: "ACTIVE",
+      notes: "Specializes in large outdoor garden setups and floral meadow installations.",
+    },
+    {
+      name: "Bravo Team (Rawalpindi & Bahria)",
+      zone: "Rawalpindi",
+      leadStaffName: "Zubair Ahmed",
+      leadPhone: "+92 302 4589123",
+      memberCount: 4,
+      status: "ACTIVE",
+      notes: "Fast turnaround squad for indoor banquet halls and home lounges.",
+    },
+  ];
+
+  for (const team of teamsData) {
+    await prisma.team.create({ data: team });
+  }
+  console.log("✅ Seed Teams created successfully.");
+
+  // 13. CREATE CRM INQUIRIES
+  const inquiriesData = [
+    {
+      name: "Farah Hashmi",
+      email: "farah.hashmi@gmail.com",
+      phone: "+92 321 5566778",
+      city: "Islamabad",
+      eventType: "1st Birthday Party",
+      preferredTheme: "Lavender Dream & Purple Princess",
+      budgetMinor: 6000000,
+      message: "Looking for an outdoor birthday decoration setup in our garden in Sector F-7 for approximately 40 guests. Need a custom cake table and marquee numbers.",
+      status: "NEW",
+    },
+    {
+      name: "Imran Siddiqui",
+      email: "imran.siddiqui@yahoo.com",
+      phone: "+92 333 4455667",
+      city: "Rawalpindi",
+      eventType: "2nd Birthday Party",
+      preferredTheme: "Vintage Little Racer",
+      budgetMinor: 5000000,
+      message: "Need a race car birthday theme at Bahria Town Phase 7 for next month.",
+      status: "CONTACTED",
+      notes: "Followed up via WhatsApp. Client will confirm date after venue availability.",
+    },
+  ];
+
+  for (const inq of inquiriesData) {
+    await prisma.inquiry.create({ data: inq });
+  }
+  console.log("✅ Seed Inquiries created successfully.");
 
   console.log("🚀 Complete Database Seeding Finished Successfully!");
 }

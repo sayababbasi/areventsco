@@ -72,7 +72,32 @@ export class BookingService {
 
     const reference = generateBookingReference();
 
-    // 4. Execute Transaction: Booking + Snapshot Items + Initial Invoice + Notification
+    // 4. Resolve Foreign Keys (Package, Theme, Venue)
+    let resolvedPackageId: string | null = null;
+    if (input.packageId) {
+      const p = await prisma.package.findFirst({
+        where: { OR: [{ id: input.packageId }, { slug: input.packageId }] },
+      });
+      if (p) resolvedPackageId = p.id;
+    }
+
+    let resolvedThemeId: string | null = null;
+    if (input.themeId) {
+      const t = await prisma.theme.findFirst({
+        where: { OR: [{ id: input.themeId }, { slug: input.themeId }, { title: input.themeId }] },
+      });
+      if (t) resolvedThemeId = t.id;
+    }
+
+    let resolvedVenueId: string | null = null;
+    if (input.venueId) {
+      const v = await prisma.venue.findFirst({
+        where: { OR: [{ id: input.venueId }, { slug: input.venueId }] },
+      });
+      if (v) resolvedVenueId = v.id;
+    }
+
+    // 5. Execute Transaction: Booking + Snapshot Items + Initial Invoice + Notification
     const invoiceCount = await prisma.invoice.count();
     const invoiceNumber = generateInvoiceNumber(invoiceCount + 1);
 
@@ -89,9 +114,9 @@ export class BookingService {
           guestCount: input.guestCount,
           city: input.city,
           venueLocation: input.address,
-          packageId: input.packageId,
-          themeId: input.themeId,
-          venueId: input.venueId,
+          packageId: resolvedPackageId,
+          themeId: resolvedThemeId,
+          venueId: resolvedVenueId,
           status: "INQUIRY",
           currency: pricing.currency,
           basePriceMinor: pricing.basePriceMinor,

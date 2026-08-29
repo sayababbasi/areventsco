@@ -58,162 +58,70 @@ export default function BookingPage() {
   const [specialRequests, setSpecialRequests] = useState("");
   const [couponCode, setCouponCode] = useState("");
 
-  // Catalog Options
-  const packages = [
-    {
-      id: "kids-wonderland-birthday",
-      title: "Kids Wonderland Experience",
-      subtitle: "Magical birthday wonderland for children",
-      priceMinor: 7500000,
-      image: "/images/themes/theme_dusty_rose_bunny.jpg",
-    },
-    {
-      id: "grand-royal-celebration",
-      title: "Grand Royal Celebration",
-      subtitle: "Our signature luxury all-inclusive birthday experience",
-      priceMinor: 12500000,
-      image: "/images/themes/theme_royal_midnight_prince.jpg",
-    },
-    {
-      id: "elegant-chic-milestone",
-      title: "Elegant Chic Milestone",
-      subtitle: "Minimalist luxury with marquee numbers for teens & adults",
-      priceMinor: 9500000,
-      image: "/images/themes/theme_sunflower_sunshine.jpg",
-    },
-    {
-      id: "pastel-dream-intimate",
-      title: "Pastel Dream Intimate",
-      subtitle: "Chic modern setup for home lounge celebrations",
-      priceMinor: 4500000,
-      image: "/images/themes/theme_lavender_dream.jpg",
-    },
-  ];
+  // Live Catalog State from Database
+  const [packages, setPackages] = useState<any[]>([]);
+  const [themes, setThemes] = useState<any[]>([]);
+  const [addons, setAddons] = useState<any[]>([]);
+  const [venues, setVenues] = useState<any[]>([]);
+  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
 
-  const themes = [
-    {
-      slug: "lavender-dream-princess",
-      title: "Lavender Dream & Purple Princess",
-      category: "Girls",
-      image: "/images/themes/theme_lavender_dream.jpg",
-      colors: ["#9370DB", "#E6E6FA", "#4B0082"],
-    },
-    {
-      slug: "sunflower-golden-sunshine",
-      title: "Golden Sunflower Sunshine",
-      category: "Floral",
-      image: "/images/themes/theme_sunflower_sunshine.jpg",
-      colors: ["#FFD700", "#FFF8DC", "#8B4513"],
-    },
-    {
-      slug: "enchanted-dusty-rose-bunny",
-      title: "Enchanted Dusty Rose Bunny",
-      category: "First Birthday",
-      image: "/images/themes/theme_dusty_rose_bunny.jpg",
-      colors: ["#C08081", "#FFE4E1", "#FFFFFF"],
-    },
-    {
-      slug: "vintage-little-racer",
-      title: "Vintage Little Racer (Beep Beep)",
-      category: "Boys",
-      image: "/images/themes/theme_vintage_racer.jpg",
-      colors: ["#DC2626", "#4B5320", "#38BDF8"],
-    },
-    {
-      slug: "jungle-safari-kingdom",
-      title: "Jungle Safari Kingdom",
-      category: "Kids",
-      image: "/images/themes/theme_jungle_safari.jpg",
-      colors: ["#2D5A27", "#D4AF37", "#D2B48C"],
-    },
-    {
-      slug: "pastel-butterfly-wonderland",
-      title: "Pastel Butterfly Wonderland",
-      category: "Girls",
-      image: "/images/themes/theme_butterfly_wonderland.jpg",
-      colors: ["#D8B4E2", "#FCE7F3", "#B89037"],
-    },
-    {
-      slug: "speed-champion-racing-two",
-      title: "Speed Champion (Racing to Two)",
-      category: "Boys",
-      image: "/images/themes/theme_speed_champion.jpg",
-      colors: ["#EF4444", "#000000", "#F59E0B"],
-    },
-    {
-      slug: "royal-midnight-prince",
-      title: "Royal Midnight Prince & Gold",
-      category: "Luxury",
-      image: "/images/themes/theme_royal_midnight_prince.jpg",
-      colors: ["#0A192F", "#D4AF37", "#FFFFFF"],
-    },
-  ];
+  // Fetch live database catalog
+  useEffect(() => {
+    async function loadCatalog() {
+      try {
+        const res = await fetch("/api/catalog");
+        const json = await res.json();
+        if (json.success && json.data) {
+          const fetchedPackages = json.data.packages.map((p: any) => ({
+            id: p.id,
+            slug: p.slug,
+            title: p.title,
+            subtitle: p.subtitle,
+            priceMinor: p.basePriceMinor,
+            image: p.featuredImage || "/images/themes/theme_royal_midnight_prince.jpg",
+          }));
+          const fetchedThemes = json.data.themes.map((t: any) => ({
+            id: t.id,
+            slug: t.slug,
+            title: t.title,
+            category: t.category,
+            image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
+            colors: t.colorPalette || ["#9370DB", "#E6E6FA"],
+          }));
+          const fetchedAddons = json.data.addons.map((a: any) => ({
+            id: a.id,
+            slug: a.slug,
+            title: a.title,
+            priceMinor: a.priceMinor,
+            desc: a.description,
+          }));
+          const fetchedVenues = json.data.venues.map((v: any) => ({
+            id: v.id,
+            slug: v.slug,
+            name: v.name,
+            city: v.city,
+            feeMinor: v.feeMinor,
+          }));
 
-  const addons = [
-    {
-      id: "pro-photography-3hr",
-      title: "3-Hour Candid Event Photography",
-      priceMinor: 1500000,
-      desc: "50+ professionally edited photos delivered in a private digital gallery.",
-    },
-    {
-      id: "cinematic-4k-video-reel",
-      title: "Cinematic 4K Video Reel & Highlights",
-      priceMinor: 2500000,
-      desc: "1-min Instagram reel + 3-min 4K event summary video with music.",
-    },
-    {
-      id: "custom-fondant-cake-2tier",
-      title: "2-Tier Themed Fondant Cake (6 lbs)",
-      priceMinor: 1400000,
-      desc: "Artisanal customized cake matching your chosen theme palette.",
-    },
-    {
-      id: "giant-marquee-numbers",
-      title: "Giant 4-Foot Light-Up Marquee Age Numbers",
-      priceMinor: 600000,
-      desc: "Warm vintage bulb illuminated numbers for the birthday age.",
-    },
-    {
-      id: "cold-spark-fireworks",
-      title: "Cold Spark Pyro Machines (Set of 2)",
-      priceMinor: 800000,
-      desc: "100% indoor-safe cold spark fountains for grand cake cutting.",
-    },
-    {
-      id: "kids-magic-puppet-show",
-      title: "Kids Magic & Comedy Puppet Show",
-      priceMinor: 1200000,
-      desc: "45-minute interactive magic and puppet performance.",
-    },
-  ];
+          setPackages(fetchedPackages);
+          setThemes(fetchedThemes);
+          setAddons(fetchedAddons);
+          setVenues(fetchedVenues);
 
-  const venues = [
-    {
-      id: "private-residence-venue",
-      name: "Private Residence / Home / Farmhouse",
-      city: "Islamabad & Rawalpindi",
-      feeMinor: 0,
-    },
-    {
-      id: "islamabad-club-banquets",
-      name: "Islamabad Club Banquets (F-6)",
-      city: "Islamabad",
-      feeMinor: 5000000,
-    },
-    {
-      id: "monal-margalla-lawn",
-      name: "Margalla Terraced Lawn",
-      city: "Islamabad",
-      feeMinor: 6500000,
-    },
-    {
-      id: "bahria-grand-lawn-rawalpindi",
-      name: "Bahria Grand Garden Terrace (Phase 7)",
-      city: "Rawalpindi",
-      feeMinor: 4000000,
-    },
-  ];
+          // Default selections
+          if (fetchedPackages.length > 0) setSelectedPackageId(fetchedPackages[0].id);
+          if (fetchedThemes.length > 0) setSelectedThemeTitle(fetchedThemes[0].title);
+          if (fetchedVenues.length > 0) setSelectedVenueId(fetchedVenues[0].id);
+          if (fetchedAddons.length > 0) setSelectedAddonIds([fetchedAddons[0].id]);
+        }
+      } catch (err) {
+        console.error("Failed to load catalog:", err);
+      } finally {
+        setIsCatalogLoading(false);
+      }
+    }
+    loadCatalog();
+  }, []);
 
   // Pricing calculation helper
   const calculateEstimatedTotal = (): PriceResult => {
@@ -555,7 +463,7 @@ export default function BookingPage() {
                       >
                         <span className="text-xs font-medium text-brand-navy-900">{th.title}</span>
                         <div className="flex space-x-1">
-                          {th.colors.map((c, cIdx) => (
+                          {th.colors.map((c: string, cIdx: number) => (
                             <span
                               key={cIdx}
                               className="w-3 h-3 rounded-full border border-black/10"

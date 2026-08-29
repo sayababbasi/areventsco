@@ -17,163 +17,85 @@ import {
   Eye,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
+import { prisma } from "@/lib/db";
 
-export default function HomePage() {
-  const featuredThemes = [
-    {
-      slug: "lavender-dream-princess",
-      title: "Lavender Dream & Purple Princess",
-      category: "Girls",
+export const revalidate = 0; // Live database query
+
+export default async function HomePage() {
+  const dbThemes = await prisma.theme.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    take: 6,
+  });
+
+  const featuredThemes = dbThemes.map((t) => {
+    let colors: string[] = [];
+    try {
+      colors = JSON.parse(t.colorPalette || "[]");
+    } catch {
+      colors = ["#9333EA", "#EC4899", "#F3E8FF"];
+    }
+    return {
+      slug: t.slug,
+      title: t.title,
+      category: t.category,
       priceMinor: 4500000,
-      image: "/images/themes/theme_lavender_dream.jpg",
-      description: "Lilac circular arch backdrop with 3D cursive script, lavender & violet balloon garland, and fluted pedestals on garden lawn.",
-      colors: ["#9370DB", "#E6E6FA", "#4B0082"],
-    },
-    {
-      slug: "sunflower-golden-sunshine",
-      title: "Golden Sunflower Sunshine",
-      category: "Floral",
-      priceMinor: 4800000,
-      image: "/images/themes/theme_sunflower_sunshine.jpg",
-      description: "Natural wood slat backdrop with glowing neon 'Happy Birthday' lighting, sunny yellow balloon arch, and giant wooden ONE letters.",
-      colors: ["#FFD700", "#FFF8DC", "#8B4513"],
-    },
-    {
-      slug: "enchanted-dusty-rose-bunny",
-      title: "Enchanted Dusty Rose Bunny",
-      category: "First Birthday",
-      priceMinor: 5500000,
-      image: "/images/themes/theme_dusty_rose_bunny.jpg",
-      description: "Dusty rose velvet arch panel, blooming botanical floral meadow bed, storybook Peter Rabbit cutout, and pastel entryway balloon arch.",
-      colors: ["#C08081", "#FFE4E1", "#FFFFFF"],
-    },
-    {
-      slug: "vintage-little-racer",
-      title: "Vintage Little Racer (Beep Beep)",
-      category: "Boys",
-      priceMinor: 5000000,
-      image: "/images/themes/theme_vintage_racer.jpg",
-      description: "Beep Beep! I'm ONE! backdrop with colorful balloon clusters, black & white checkered runner, toy speedsters, and 3D ONE car blocks.",
-      colors: ["#DC2626", "#4B5320", "#38BDF8"],
-    },
-    {
-      slug: "jungle-safari-kingdom",
-      title: "Jungle Safari Kingdom",
-      category: "Kids",
-      priceMinor: 5200000,
-      image: "/images/themes/theme_jungle_safari.jpg",
-      description: "Circular balloon hoop of sage green and gold balloons, tropical monstera leaves, white cake plinths, and lifelike plush safari animals.",
-      colors: ["#2D5A27", "#D4AF37", "#D2B48C"],
-    },
-    {
-      slug: "royal-midnight-prince",
-      title: "Royal Midnight Prince & Gold",
-      category: "Luxury",
-      priceMinor: 6500000,
-      image: "/images/themes/theme_royal_midnight_prince.jpg",
-      description: "Navy royal crest backdrop with illuminated neon crown, chrome gold balloon arch, 3 gold mirror plinths, and monogram floor decal.",
-      colors: ["#0A192F", "#D4AF37", "#FFFFFF"],
-    },
-  ];
+      image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
+      description: t.description,
+      colors,
+    };
+  });
 
-  const packages = [
-    {
-      slug: "grand-royal-celebration",
-      title: "Grand Royal Celebration",
-      subtitle: "Our signature luxury all-inclusive birthday planning experience",
-      priceMinor: 12500000,
-      capacity: "30 - 150 Guests",
-      duration: "5 Hours Coverage",
-      image: "/images/themes/theme_royal_midnight_prince.jpg",
-      featured: true,
-      features: [
-        "16ft x 10ft bespoke 3D stage backdrop with acrylic name cutout",
-        "20ft organic chrome gold & navy balloon garland installation",
-        "Stage lighting, warm ambient uplighting & cold spark effects",
-        "3-Tier customized theme cake (Belgian Chocolate/Fudge)",
-        "3 Hours professional photography with edited digital gallery",
-        "Dedicated on-site setup supervisor & decor crew",
-      ],
-    },
-    {
-      slug: "kids-wonderland-birthday",
-      title: "Kids Wonderland Experience",
-      subtitle: "Magical birthday wonderland designed to spark pure joy",
-      priceMinor: 7500000,
-      capacity: "20 - 80 Guests",
-      duration: "4 Hours Coverage",
-      image: "/images/themes/theme_dusty_rose_bunny.jpg",
-      featured: false,
-      features: [
-        "10ft custom circular or arched themed backdrop",
-        "12ft organic balloon garland with thematic foil accents",
-        "Set of 3 custom themed cake plinths with vinyl decals",
-        "Life-sized themed character cutouts & props",
-        "Kids party favor display easel & welcome board",
-        "2 Hours event coverage with 40+ edited photos",
-      ],
-    },
-    {
-      slug: "elegant-chic-milestone",
-      title: "Elegant Chic Milestone",
-      subtitle: "Sophisticated minimalism for 18th, 21st, 30th & 50th birthdays",
-      priceMinor: 9500000,
-      capacity: "25 - 100 Guests",
-      duration: "4 Hours Coverage",
-      image: "/images/themes/theme_sunflower_sunshine.jpg",
-      featured: false,
-      features: [
-        "8ft x 8ft natural wooden slatted or gold shimmer backdrop",
-        "Neon LED sign ('Happy Birthday' / Custom Name)",
-        "Giant 4-foot illuminated marquee age numbers",
-        "Lush organic balloon garland with fresh floral accents",
-        "Luxury dessert cart & cake pedestal styling",
-        "Warm uplighting kit for evening ambiance",
-      ],
-    },
-  ];
+  const dbPackages = await prisma.package.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    take: 3,
+  });
 
-  const testimonials = [
-    {
-      name: "Ayesha Malik",
-      location: "Sector F-7/2, Islamabad",
-      event: "Zayd's 1st Birthday (Safari Theme)",
-      quote:
-        "AR Events Co. delivered beyond our wildest expectations! The balloon garland and life-sized safari cutouts looked like they came straight out of a luxury magazine. The entire setup in our Islamabad residence was completed 3 hours before guests arrived.",
-      rating: 5,
-    },
-    {
-      name: "Brig. (R) Tariq Mahmood",
-      location: "DHA Phase 2, Islamabad",
-      event: "50th Milestone Birthday",
-      quote:
-        "Superb execution, polite staff, and impeccable attention to detail. The midnight navy and gold theme with marquee numbers added such a refined elegance to our banquet. Truly the top event planners in the twin cities.",
-      rating: 5,
-    },
-    {
-      name: "Mahnoor & Bilal",
-      location: "Bahria Town Phase 4, Rawalpindi",
-      event: "Princess Castle 5th Birthday",
-      quote:
-        "Our daughter was completely mesmerized by the castle backdrop and balloon clouds. Booking online was effortless and the coordination was flawless. We couldn't be happier!",
-      rating: 5,
-    },
-  ];
+  const packages = dbPackages.map((p) => {
+    let feats: string[] = [];
+    try {
+      feats = JSON.parse(p.features || "[]");
+    } catch {
+      feats = ["Full Stage Backdrop", "Organic Balloon Arch", "Cake Pedestals", "On-Site Supervisor"];
+    }
+    return {
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      subtitle: p.subtitle || "Complete birthday celebration package",
+      priceMinor: p.basePriceMinor,
+      capacity: `${p.guestCapacityMin} - ${p.guestCapacityMax} Guests`,
+      duration: `${p.estimatedDurationHours} Hours Coverage`,
+      image: p.featuredImage || "/images/themes/theme_royal_midnight_prince.jpg",
+      featured: p.isFeatured,
+      features: feats,
+    };
+  });
 
-  const faqs = [
-    {
-      q: "Which areas in Islamabad and Rawalpindi do you serve?",
-      a: "We provide complete decor and event planning across all Islamabad sectors (F, G, E, H, I, Bani Gala, Chak Shahzad, Park View City, Bahria Enclave) and all Rawalpindi zones including Bahria Town (Phases 1-8), DHA (Phases 1-5), Cantt, and Satellite Town.",
-    },
-    {
-      q: "Can I customize a package with specific colors or extra services?",
-      a: "Yes! During online booking or consultation, you can customize your theme palette, add 4K videography, custom themed cakes, magic shows, cold spark pyro machines, and live food counters.",
-    },
-    {
-      q: "How does the booking and payment process work?",
-      a: "Select your package, date, and venue. Our system verifies date availability and calculates your transparent price. An advance deposit secures your date, with the balance payable on event day.",
-    },
-  ];
+  const dbReviews = await prisma.review.findMany({
+    where: { isActive: true },
+    orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+    take: 3,
+  });
+
+  const testimonials = dbReviews.map((r) => ({
+    name: r.authorName,
+    location: r.authorLocation,
+    event: r.eventTitle,
+    quote: r.comment,
+    rating: r.rating,
+  }));
+
+  const dbFaqs = await prisma.faq.findMany({
+    where: { isActive: true, isFeatured: true },
+    take: 4,
+  });
+
+  const faqs = dbFaqs.map((f) => ({
+    q: f.question,
+    a: f.answer,
+  }));
 
   return (
     <div className="space-y-24 pb-20">
@@ -250,7 +172,7 @@ export default function HomePage() {
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950/85 via-transparent to-transparent" />
-                    
+
                     <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
                       <span className="badge-gold bg-brand-navy-950/90 text-brand-gold-300 border-brand-gold-400 text-xs">
                         Real Islamabad Setup
@@ -270,7 +192,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. FEATURED BIRTHDAY THEMES (THE PRIMARY PRODUCT) */}
+      {/* 2. FEATURED BIRTHDAY THEMES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2">
@@ -287,7 +209,7 @@ export default function HomePage() {
             href="/themes"
             className="text-sm font-semibold text-brand-gold-700 hover:text-brand-gold-800 flex items-center space-x-1.5 group"
           >
-            <span>Explore All 8 Themes</span>
+            <span>Explore All Themes</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
@@ -304,7 +226,7 @@ export default function HomePage() {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950/70 via-transparent to-transparent" />
-                  
+
                   <div className="absolute top-3 left-3">
                     <span className="badge-gold bg-brand-navy-950/90 text-brand-gold-300 border-brand-gold-400 text-xs">
                       {theme.category}
@@ -359,7 +281,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. HOW IT WORKS (THE SIMPLE 5-STEP JOURNEY) */}
+      {/* 3. HOW IT WORKS (5-STEP JOURNEY) */}
       <section className="bg-brand-warm-50 py-16 border-y border-brand-warm-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center space-y-3">
@@ -449,52 +371,57 @@ export default function HomePage() {
               )}
 
               <div>
-                <div className="relative h-52 w-full overflow-hidden bg-brand-warm-100">
+                <div className="relative h-52 w-full overflow-hidden rounded-t-2xl bg-brand-warm-100">
                   <Image
                     src={pkg.image}
                     alt={pkg.title}
                     fill
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-navy-950/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4 text-white">
-                    <span className="text-xs font-semibold text-brand-gold-300">{pkg.capacity}</span>
-                    <h3 className="text-xl font-serif font-bold text-white">{pkg.title}</h3>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <p className="text-xl font-serif font-bold">{pkg.title}</p>
                   </div>
                 </div>
 
                 <div className="p-6 space-y-4">
-                  <p className="text-xs text-brand-navy-600 leading-relaxed">{pkg.subtitle}</p>
-
-                  <div className="space-y-2 pt-2 border-t border-brand-warm-100">
-                    {pkg.features.map((f, i) => (
-                      <div key={i} className="flex items-start space-x-2 text-xs text-brand-navy-800">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold-600 shrink-0 mt-0.5" />
-                        <span>{f}</span>
-                      </div>
-                    ))}
+                  <div className="flex items-baseline justify-between border-b border-brand-warm-200 pb-4">
+                    <div>
+                      <span className="text-xs text-brand-navy-500 font-medium">Starting from</span>
+                      <p className="text-2xl font-serif font-bold text-brand-navy-950">
+                        {formatPKR(pkg.priceMinor)}
+                      </p>
+                    </div>
+                    <div className="text-right text-xs text-brand-navy-600">
+                      <p className="font-semibold">{pkg.capacity}</p>
+                      <p>{pkg.duration}</p>
+                    </div>
                   </div>
+
+                  <p className="text-xs text-brand-navy-700 leading-relaxed">
+                    {pkg.subtitle}
+                  </p>
+
+                  <ul className="space-y-2 text-xs text-brand-navy-800 pt-2">
+                    {pkg.features.slice(0, 4).map((f, i) => (
+                      <li key={i} className="flex items-center space-x-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold-600 flex-shrink-0" />
+                        <span className="truncate">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
 
-              <div className="p-6 pt-0 space-y-3">
-                <div className="flex items-baseline justify-between pt-3 border-t border-brand-warm-200">
-                  <span className="text-xs text-brand-navy-500 font-medium">All-Inclusive</span>
-                  <span className="text-2xl font-bold font-serif text-brand-navy-950">
-                    {formatPKR(pkg.priceMinor)}
-                  </span>
-                </div>
-
+              <div className="p-6 pt-0">
                 <Link
-                  href={`/book?package=${pkg.slug}`}
-                  className={`w-full py-3.5 text-center text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-2 ${
-                    pkg.featured
-                      ? "btn-gold shadow-md"
-                      : "border border-brand-navy-900 text-brand-navy-900 hover:bg-brand-navy-900 hover:text-white"
+                  href={`/book?package=${pkg.id}`}
+                  className={`w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 transition-all ${
+                    pkg.featured ? "btn-gold shadow-md" : "btn-outline-navy"
                   }`}
                 >
-                  <Calendar className="w-4 h-4" />
-                  <span>Book This Package</span>
+                  <span>Select {pkg.title}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -502,111 +429,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. TWIN CITIES SERVICE AREAS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-3xl bg-brand-warm-50 border border-brand-warm-200 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-6 space-y-4">
-            <span className="badge-gold uppercase text-xs">Local Twin Cities Coverage</span>
-            <h2 className="text-3xl font-serif text-brand-navy-950 font-bold">
-              We Set Up Across Islamabad & Rawalpindi
+      {/* 5. TESTIMONIALS */}
+      {testimonials.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center space-y-3">
+            <span className="badge-gold uppercase text-xs">Real Feedback</span>
+            <h2 className="text-3xl sm:text-4xl font-serif text-brand-navy-950 font-bold">
+              Stories from Twin Cities Hosts
             </h2>
-            <p className="text-sm text-brand-navy-700 leading-relaxed">
-              Whether you are hosting at your private residence, lawn, farmhouse, rented hall, or premier twin-cities venue, our logistics and decor team handles 100% on-time delivery, setup, and cleanup.
-            </p>
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 bg-white rounded-xl border border-brand-warm-200 space-y-1">
-                <p className="font-bold text-brand-navy-950 text-sm">Islamabad</p>
-                <p className="text-xs text-brand-navy-600">Sectors F, G, E, H, I, Bani Gala, Chak Shahzad, Park View, Bahria Enclave</p>
-              </div>
-              <div className="p-3.5 bg-white rounded-xl border border-brand-warm-200 space-y-1">
-                <p className="font-bold text-brand-navy-950 text-sm">Rawalpindi</p>
-                <p className="text-xs text-brand-navy-600">Bahria Town (1-8), DHA (1-5), Cantt, Satellite Town, Chaklala, Saddar</p>
-              </div>
-            </div>
+            <div className="gold-divider mx-auto" />
           </div>
 
-          <div className="lg:col-span-6 relative h-72 sm:h-80 rounded-2xl overflow-hidden shadow-sm border border-brand-warm-200">
-            <Image
-              src="/images/hero/hero_birthday_lawn.jpg"
-              alt="AR Events Co. Islamabad Twin Cities Coverage"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-brand-navy-950/30" />
-            <div className="absolute bottom-4 left-4 right-4 p-4 bg-white/95 backdrop-blur-sm rounded-xl border border-white/40 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-brand-navy-950">On-Time Arrival Guarantee</p>
-                <p className="text-[11px] text-brand-navy-600">Team arrives 3 hours prior to guest arrival</p>
-              </div>
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. TESTIMONIALS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="text-center space-y-3">
-          <span className="badge-gold uppercase text-xs">Client Reviews</span>
-          <h2 className="text-3xl sm:text-4xl font-serif text-brand-navy-950 font-bold">
-            Trusted by Twin-Cities Families
-          </h2>
-          <div className="gold-divider mx-auto" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, idx) => (
-            <div key={idx} className="p-6 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex text-brand-gold-500 space-x-1">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-brand-gold-500" />
-                  ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((t, idx) => (
+              <div key={idx} className="card-luxury p-8 flex flex-col justify-between space-y-6">
+                <div className="space-y-3">
+                  <div className="flex space-x-1 text-amber-500">
+                    {Array.from({ length: t.rating }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                    ))}
+                  </div>
+                  <h4 className="font-serif font-bold text-brand-navy-950 text-base">{t.event}</h4>
+                  <p className="text-xs sm:text-sm text-brand-navy-700 leading-relaxed italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-brand-navy-700 italic leading-relaxed">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
+                <div className="pt-4 border-t border-brand-warm-200">
+                  <strong className="block text-brand-navy-950 text-sm font-semibold">{t.name}</strong>
+                  <span className="text-xs text-brand-navy-500">{t.location}</span>
+                </div>
               </div>
-              <div className="pt-3 border-t border-brand-warm-100">
-                <p className="text-sm font-bold text-brand-navy-950">{t.name}</p>
-                <p className="text-xs text-brand-navy-500">{t.location} • {t.event}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* 7. FINAL CALL TO ACTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-10 sm:p-14 rounded-3xl bg-brand-navy-950 text-white text-center space-y-6 relative overflow-hidden border border-brand-gold-300/30">
-          <div className="space-y-3 max-w-2xl mx-auto relative z-10">
-            <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold-400">
-              Let&apos;s Create Your Celebration
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-serif font-bold text-white">
-              Ready to Book Your Birthday Setup?
+      {/* 6. FAQ SECTION */}
+      {faqs.length > 0 && (
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-3">
+            <span className="badge-gold uppercase text-xs">Got Questions?</span>
+            <h2 className="text-3xl sm:text-4xl font-serif text-brand-navy-950 font-bold">
+              Frequently Asked Questions
             </h2>
-            <p className="text-sm sm:text-base text-brand-navy-200 leading-relaxed">
-              Explore our birthday themes, customize your decor package, and secure your date online in minutes.
-            </p>
+            <div className="gold-divider mx-auto" />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10 pt-2">
-            <Link
-              href="/themes"
-              className="btn-gold w-full sm:w-auto px-8 py-4 text-base font-semibold shadow-lg"
-            >
-              Explore Birthday Themes
-            </Link>
-            <Link
-              href="/book"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl border border-white/30 text-white text-base font-semibold hover:bg-white/10 transition-colors"
-            >
-              Book Decoration Online
-            </Link>
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="card-luxury p-6 space-y-2">
+                <h3 className="text-base font-serif font-bold text-brand-navy-950">{faq.q}</h3>
+                <p className="text-xs sm:text-sm text-brand-navy-700 leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
