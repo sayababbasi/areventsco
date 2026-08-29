@@ -1,6 +1,5 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -44,7 +43,7 @@ const config: Config = {
             300: "#ddddd2",
             400: "#c7c7b8",
             500: "#a9a997",
-          }
+          },
         },
       },
       fontFamily: {
@@ -57,12 +56,7 @@ const config: Config = {
         elevated: "0 12px 32px -4px rgba(11, 21, 36, 0.12), 0 4px 12px -2px rgba(11, 21, 36, 0.06)",
         gold: "0 4px 20px -2px rgba(184, 144, 55, 0.25)",
       },
-      borderRadius: {
-        'luxury': '0.75rem',
-      }
     },
   },
   plugins: [],
 };
-
-export default config;

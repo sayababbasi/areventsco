@@ -9,12 +9,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-brand-navy-800">
           {/* Column 1: Brand & Tagline */}
           <div className="space-y-4">
-            <div className="relative h-16 w-44">
+            <div className="relative flex items-center h-16 w-auto">
               <Image
                 src="/brand/bg remove logo.png"
                 alt="AR Events Co. Logo"
-                fill
-                className="object-contain brightness-110"
+                width={200}
+                height={64}
+                className="h-14 w-auto object-contain brightness-110"
               />
             </div>
             <p className="text-brand-gold-400 font-brand-title text-sm tracking-widest uppercase">

@@ -34,12 +34,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div>
           {/* Brand Header */}
           <div className="p-6 border-b border-brand-navy-800">
-            <Link href="/" className="inline-block relative h-12 w-40">
+            <Link href="/" className="inline-flex items-center">
               <Image
                 src="/brand/bg remove logo.png"
                 alt="AR Events Co."
-                fill
-                className="object-contain brightness-110"
+                width={160}
+                height={48}
+                className="h-10 w-auto object-contain brightness-110"
               />
             </Link>
             <div className="mt-2 flex items-center space-x-1.5">

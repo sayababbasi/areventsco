@@ -55,12 +55,13 @@ export function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="relative h-14 w-40 sm:w-48 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative flex items-center h-14 w-auto transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/brand/bg remove logo.png"
                 alt="AR Events Co. Logo"
-                fill
-                className="object-contain"
+                width={200}
+                height={56}
+                className="h-12 sm:h-14 w-auto object-contain"
                 priority
               />
             </div>

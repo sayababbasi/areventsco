@@ -45,8 +45,14 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-brand-warm-50/50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-3">
-        <Link href="/" className="inline-block relative h-16 w-44">
-          <Image src="/brand/bg remove logo.png" alt="AR Events Co." fill className="object-contain" />
+        <Link href="/" className="inline-flex items-center justify-center">
+          <Image
+            src="/brand/bg remove logo.png"
+            alt="AR Events Co."
+            width={180}
+            height={56}
+            className="h-14 w-auto object-contain"
+          />
         </Link>
         <h1 className="text-2xl font-bold font-serif text-brand-navy-950">
           Create Client Account
