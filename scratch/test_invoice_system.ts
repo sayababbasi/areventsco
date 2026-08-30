@@ -24,7 +24,7 @@ async function runInvoiceAudit() {
   const detail = await InvoiceService.getInvoiceById(testInvoice.id);
   console.log(`✓ Invoice Detail fetched: ${detail?.customerName} - Status: ${detail?.status}`);
   console.log(`✓ Line Items Count: ${detail?.items.length}`);
-  detail?.items.forEach((it, idx) => {
+  detail?.items.forEach((it: any, idx: number) => {
     console.log(`   ${idx + 1}. ${it.description} | Qty: ${it.quantity} | Total: PKR ${(it.totalPriceMinor / 100).toLocaleString()}`);
   });
 
