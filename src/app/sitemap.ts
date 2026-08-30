@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { APP_BASE_URL } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
