@@ -18,6 +18,7 @@ import {
   Receipt,
 } from "lucide-react";
 import { format } from "date-fns";
+import { SafepayPaymentCard } from "@/components/booking/SafepayPaymentCard";
 
 interface BookingDetailPageProps {
   params: {
@@ -117,6 +118,9 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
 
   const isFullyPaid = booking.balanceDueMinor === 0 && booking.amountPaidMinor > 0;
   const isPartiallyPaid = booking.amountPaidMinor > 0 && booking.balanceDueMinor > 0;
+  const isAdvancePaid =
+    booking.amountPaidMinor >=
+    (booking.depositRequiredMinor > 0 ? booking.depositRequiredMinor : Math.round(booking.totalAmountMinor * 0.3));
 
   return (
     <div className="py-12 sm:py-16 bg-brand-warm-50/50 min-h-screen">
@@ -190,12 +194,23 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
               )}
             </div>
 
-            {/* Payment & Bank Transfer Instructions */}
-            <div className="card-luxury p-6 space-y-4 bg-brand-gold-50/50 border-brand-gold-200">
+            {/* 1. SECURE ONLINE PAYMENT (SAFEPAY SANDBOX) */}
+            <SafepayPaymentCard
+              bookingReference={booking.reference}
+              totalAmountMinor={booking.totalAmountMinor}
+              depositRequiredMinor={booking.depositRequiredMinor}
+              amountPaidMinor={booking.amountPaidMinor}
+              balanceDueMinor={booking.balanceDueMinor}
+              isFullyPaid={isFullyPaid}
+              isAdvancePaid={isAdvancePaid}
+            />
+
+            {/* 2. MANUAL BANK TRANSFER INSTRUCTIONS */}
+            <div className="card-luxury p-6 space-y-4 bg-brand-gold-50/30 border-brand-gold-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-bold font-serif text-brand-navy-950 flex items-center">
                   <CreditCard className="w-4 h-4 text-brand-gold-600 mr-2" />
-                  Advance Deposit & Payment
+                  Manual Bank Transfer (Alternative)
                 </h2>
                 {isFullyPaid && (
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">

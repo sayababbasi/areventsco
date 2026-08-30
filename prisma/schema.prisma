@@ -315,11 +315,15 @@ model Payment {
   
   amountMinor     Int              // In Paisa
   currency        String           @default("PKR")
-  paymentType     String           @default("DEPOSIT") // DEPOSIT, FULL, PARTIAL, REFUND, ADJUSTMENT
-  paymentMethod   String           @default("BANK_TRANSFER") // BANK_TRANSFER, CASH, JAZZCASH, EASYPAISA, CARD, ONLINE
-  status          String           @default("PENDING") // PENDING, PROCESSING, PAID, VERIFIED, FAILED, REFUNDED
+  paymentType     String           @default("DEPOSIT") // DEPOSIT, FULL, PARTIAL, REFUND, ADJUSTMENT, ADVANCE, BALANCE
+  paymentMethod   String           @default("BANK_TRANSFER") // SAFEPAY, BANK_TRANSFER, CASH, JAZZCASH, EASYPAISA, CARD, ONLINE
+  status          String           @default("PENDING") // PENDING, PROCESSING, PAID, VERIFIED, FAILED, REFUNDED, CANCELLED
   
+  provider        String           @default("manual") // "safepay" | "manual" | "mock"
   providerRef     String?          // External Transaction ID or Bank Reference
+  providerToken   String?          // Safepay Tracker Token (track_xxx)
+  failureReason   String?
+  metadata        String?          // JSON metadata for webhook / transaction logs
   receiptImage    String?          // Bank transfer slip URL
   notes           String?
   paidAt          DateTime?
@@ -328,6 +332,7 @@ model Payment {
 
   @@index([bookingId])
   @@index([invoiceId])
+  @@index([providerToken])
 }
 
 model Invoice {
