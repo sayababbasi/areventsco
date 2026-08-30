@@ -241,14 +241,22 @@ export default function AdminBookingsPage() {
                     </td>
 
                     <td className="p-4 text-right">
-                      <Link
-                        href={`/booking/${b.reference}`}
-                        target="_blank"
-                        className="inline-flex items-center space-x-1 text-xs font-semibold text-brand-gold-700 hover:underline"
-                      >
-                        <span>Invoice</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
+                      <div className="flex items-center justify-end space-x-2">
+                        <Link
+                          href={`/admin/invoices?search=${b.reference}`}
+                          className="px-2.5 py-1 bg-brand-navy-900 hover:bg-brand-navy-800 text-brand-gold-400 rounded-lg text-xs font-semibold transition"
+                        >
+                          Invoice Workspace
+                        </Link>
+                        <Link
+                          href={`/booking/${b.reference}`}
+                          target="_blank"
+                          className="p-1 text-brand-navy-500 hover:text-brand-navy-900 transition"
+                          title="Client View"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -86,3 +86,19 @@ export function verifySessionToken(token: string): SessionUser | null {
     return null;
   }
 }
+
+/**
+ * Retrieves and validates the current logged in session from HTTP-only cookie
+ */
+export async function getAuthSession(): Promise<SessionUser | null> {
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = cookies();
+    const token = cookieStore.get("ar_session")?.value;
+    if (!token) return null;
+    return verifySessionToken(token);
+  } catch {
+    return null;
+  }
+}
+

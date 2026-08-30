@@ -310,12 +310,14 @@ model Payment {
   id              String           @id @default(cuid())
   bookingId       String
   booking         Booking          @relation(fields: [bookingId], references: [id])
+  invoiceId       String?
+  invoice         Invoice?         @relation(fields: [invoiceId], references: [id])
   
   amountMinor     Int              // In Paisa
   currency        String           @default("PKR")
-  paymentType     String           @default("DEPOSIT") // DEPOSIT, FULL, PARTIAL, REFUND
-  paymentMethod   String           @default("BANK_TRANSFER") // BANK_TRANSFER, CASH, JAZZCASH, EASYPAISA, CARD
-  status          String           @default("PENDING") // PENDING, PROCESSING, PAID, FAILED, REFUNDED
+  paymentType     String           @default("DEPOSIT") // DEPOSIT, FULL, PARTIAL, REFUND, ADJUSTMENT
+  paymentMethod   String           @default("BANK_TRANSFER") // BANK_TRANSFER, CASH, JAZZCASH, EASYPAISA, CARD, ONLINE
+  status          String           @default("PENDING") // PENDING, PROCESSING, PAID, VERIFIED, FAILED, REFUNDED
   
   providerRef     String?          // External Transaction ID or Bank Reference
   receiptImage    String?          // Bank transfer slip URL
@@ -323,34 +325,49 @@ model Payment {
   paidAt          DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  @@index([bookingId])
+  @@index([invoiceId])
 }
 
 model Invoice {
-  id              String           @id @default(cuid())
-  invoiceNumber   String           @unique // e.g. INV-2026-0042
-  bookingId       String
-  booking         Booking          @relation(fields: [bookingId], references: [id])
+  id                     String            @id @default(cuid())
+  invoiceNumber          String            @unique // e.g. INV-2026-0042
+  bookingId              String
+  booking                Booking           @relation(fields: [bookingId], references: [id])
   
-  customerName    String
-  customerEmail   String
-  customerPhone   String?
-  customerAddress String?
+  customerName           String
+  customerEmail          String
+  customerPhone          String?
+  customerAddress        String?
   
-  subtotalMinor   Int
-  discountMinor   Int              @default(0)
-  taxMinor        Int              @default(0)
-  totalAmountMinor Int
-  amountPaidMinor Int              @default(0)
-  balanceDueMinor Int              @default(0)
-  currency        String           @default("PKR")
+  subtotalMinor          Int
+  discountMinor          Int               @default(0)
+  taxMinor               Int               @default(0)
+  additionalChargesMinor Int               @default(0)
+  totalAmountMinor       Int
+  amountPaidMinor        Int               @default(0)
+  balanceDueMinor        Int               @default(0)
+  depositRequiredMinor   Int               @default(0)
+  currency               String            @default("PKR")
   
-  status          String           @default("UNPAID") // UNPAID, PARTIALLY_PAID, PAID, CANCELLED
-  dueDate         DateTime
-  paidAt          DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  status                 String            @default("UNPAID") // DRAFT, ISSUED, UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED, VOID
+  dueDate                DateTime
+  issuedAt               DateTime?         @default(now())
+  paidAt                 DateTime?
+  customerNotes          String?
+  internalNotes          String?
+  pdfUrl                 String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
 
-  items           InvoiceItem[]
+  items                  InvoiceItem[]
+  payments               Payment[]
+  auditLogs              InvoiceAuditLog[]
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([customerEmail])
 }
 
 model InvoiceItem {
@@ -363,6 +380,20 @@ model InvoiceItem {
   quantity        Int              @default(1)
   totalPriceMinor Int
   currency        String           @default("PKR")
+
+  @@index([invoiceId])
+}
+
+model InvoiceAuditLog {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  action      String   // CREATED, ISSUED, PAYMENT_RECORDED, PAYMENT_REVERSED, UPDATED, STATUS_CHANGED, VOIDED, DOWNLOADED
+  performedBy String   @default("System") // User name, email, or "Customer"
+  details     String?  // Description of change
+  createdAt   DateTime @default(now())
+
+  @@index([invoiceId])
 }
 
 model Coupon {

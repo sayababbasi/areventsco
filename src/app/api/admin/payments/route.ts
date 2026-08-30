@@ -53,10 +53,11 @@ export async function POST(req: Request) {
     const payment = await prisma.payment.create({
       data: {
         bookingId,
+        invoiceId: booking.invoices[0]?.id || null,
         amountMinor: amount,
         paymentType: paymentType || "DEPOSIT",
         paymentMethod: paymentMethod || "BANK_TRANSFER",
-        status: "PAID",
+        status: "VERIFIED",
         providerRef: providerRef || `MBL-TRX-${Date.now().toString().slice(-8)}`,
         notes: notes || null,
         paidAt: new Date(),
