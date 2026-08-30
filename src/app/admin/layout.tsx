@@ -31,6 +31,9 @@ import {
   BarChart3,
   MessageSquareQuote,
   Building,
+  Globe,
+  Link2,
+  Compass,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -58,6 +61,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
+      title: "SEO & DISCOVERY",
+      items: [
+        { name: "SEO Dashboard", href: "/admin/seo", icon: Globe },
+        { name: "Pages & Entities", href: "/admin/seo/pages", icon: FileText },
+        { name: "Local SEO Hubs", href: "/admin/seo/locations", icon: MapPin },
+        { name: "301 Redirects", href: "/admin/seo/redirects", icon: Link2 },
+        { name: "Business NAP", href: "/admin/seo/settings", icon: Compass },
+      ],
+    },
+    {
       title: "OPERATIONS",
       items: [
         { name: "Venues", href: "/admin/venues", icon: Building },
@@ -79,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Gallery", href: "/admin/gallery", icon: ImageIcon },
         { name: "Reviews & Testimonials", href: "/admin/reviews", icon: Star },
         { name: "FAQs", href: "/admin/faqs", icon: HelpCircle },
-        { name: "Settings & SEO", href: "/admin/settings", icon: Settings },
+        { name: "Settings", href: "/admin/settings", icon: Settings },
       ],
     },
   ];

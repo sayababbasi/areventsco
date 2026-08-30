@@ -1,14 +1,31 @@
 import { MetadataRoute } from "next";
+import { APP_BASE_URL } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://areventsco.com";
-
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/admin/", "/api/admin/", "/dashboard/"],
-    },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: [
+          "/admin/",
+          "/admin/*",
+          "/api/admin/",
+          "/api/admin/*",
+          "/dashboard/",
+          "/dashboard/*",
+          "/login",
+          "/register",
+          "/booking/*",
+        ],
+      },
+      {
+        userAgent: "Googlebot",
+        allow: "/",
+        disallow: ["/admin/", "/api/admin/", "/dashboard/"],
+      },
+    ],
+    sitemap: `${APP_BASE_URL}/sitemap.xml`,
+    host: APP_BASE_URL,
   };
 }

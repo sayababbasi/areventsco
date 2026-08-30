@@ -28,6 +28,9 @@ async function main() {
   await prisma.team.deleteMany();
   await prisma.inquiry.deleteMany();
   await prisma.expense.deleteMany();
+  await prisma.locationPage.deleteMany();
+  await prisma.redirect.deleteMany();
+  await prisma.seoAuditLog.deleteMany();
   await prisma.customerProfile.deleteMany();
   await prisma.staffProfile.deleteMany();
   await prisma.user.deleteMany();
@@ -891,6 +894,221 @@ async function main() {
     await prisma.inquiry.create({ data: inq });
   }
   console.log("✅ Seed Inquiries created successfully.");
+
+  // 14. CREATE LOCAL SEO LOCATION PAGES
+  const locationPagesData = [
+    {
+      slug: "islamabad",
+      name: "Islamabad",
+      city: "Islamabad",
+      headline: "Premier Birthday Decoration & Event Planning in Islamabad",
+      subheadline: "Turnkey birthday setups delivered to Sector F-6, F-7, F-8, E-11, G-11, I-8, Bani Gala & Chak Shahzad.",
+      introContent: "AR Events Co. is Islamabad's leading luxury birthday styling company. From intimate home living room setups to grand outdoor lawn celebrations against the Margalla Hills, we provide bespoke 3D circular arches, organic double-stuffed balloon installations, personalized acrylic name boards, and ambient evening uplighting.",
+      coverageAreas: JSON.stringify(["Sector F-6", "Sector F-7", "Sector F-8", "Sector F-10", "Sector F-11", "Sector E-7", "Sector E-11", "Sector G-10", "Sector G-11", "Sector G-13", "Sector I-8", "Bani Gala", "Chak Shahzad", "Park View City", "Bahria Enclave"]),
+      featuredImage: "/images/hero/hero_birthday_lawn.jpg",
+      seoTitle: "Birthday Decoration Islamabad | Top Event Decorators | AR Events Co.",
+      seoDescription: "Luxury birthday decoration and party styling across Islamabad. Thematic 3D backdrops, organic balloon arches, marquee numbers, and cakes in F-6, F-7, F-8, E-11 & Bani Gala.",
+      focusKeyword: "birthday decoration Islamabad",
+      secondaryKeywords: JSON.stringify(["birthday decorators Islamabad", "birthday party planning Islamabad", "kids birthday themes Islamabad", "balloon decoration Islamabad"]),
+      canonicalUrl: "https://areventsco.com/locations/islamabad",
+      ogImage: "/images/hero/hero_birthday_lawn.jpg",
+      sortOrder: 1,
+    },
+    {
+      slug: "rawalpindi",
+      name: "Rawalpindi",
+      city: "Rawalpindi",
+      headline: "Luxury Birthday Event Styling & Decor in Rawalpindi",
+      subheadline: "Full event production across Bahria Town, DHA, Satellite Town, Cantt, Chaklala & PWD.",
+      introContent: "Celebrate your child's first birthday or special milestone with Rawalpindi's highest-rated event stylists. AR Events Co. brings commercial-grade party props, illuminated marquee letters, custom tiered bakery masterpieces, and professional event photography right to your doorstep or banquet hall in Rawalpindi.",
+      coverageAreas: JSON.stringify(["Bahria Town (Phases 1-8)", "DHA Rawalpindi (Phases 1-5)", "Satellite Town", "Rawalpindi Cantt", "Chaklala Scheme 3", "PWD Housing Society", "Askari (All Schemes)", "Gulraiz Housing Society"]),
+      featuredImage: "/images/themes/theme_vintage_racer.jpg",
+      seoTitle: "Birthday Decoration Rawalpindi | Event Planners | AR Events Co.",
+      seoDescription: "Professional birthday decoration in Rawalpindi. Serving Bahria Town, DHA, Satellite Town, Cantt & PWD with custom backdrops, balloon garlands & party packages.",
+      focusKeyword: "birthday decoration Rawalpindi",
+      secondaryKeywords: JSON.stringify(["birthday decorators Rawalpindi", "kids birthday party Rawalpindi", "balloon decoration Bahria Town Rawalpindi", "event planners Rawalpindi"]),
+      canonicalUrl: "https://areventsco.com/locations/rawalpindi",
+      ogImage: "/images/themes/theme_vintage_racer.jpg",
+      sortOrder: 2,
+    },
+    {
+      slug: "bahria-town",
+      name: "Bahria Town Islamabad & Rawalpindi",
+      city: "Rawalpindi",
+      headline: "Bespoke Birthday Decoration in Bahria Town (Phases 1–8)",
+      subheadline: "Specialized mobile decor crews operating daily in Bahria Town Phase 1 to Phase 8, Safari Villas & Garden City.",
+      introContent: "Living in Bahria Town? AR Events Co. maintains dedicated rapid-setup decor crews stationed in Bahria Town. Whether booking a grand outdoor birthday pavilion in Civic Center or styling an intimate living room lounge party, we guarantee on-time 3-hour setup and seamless post-event packdown.",
+      coverageAreas: JSON.stringify(["Bahria Town Phase 1", "Bahria Town Phase 2", "Bahria Town Phase 3", "Bahria Town Phase 4", "Bahria Town Phase 7", "Bahria Town Phase 8", "Safari Villas", "Garden City", "Executive Lodges"]),
+      featuredImage: "/images/themes/theme_royal_midnight_prince.jpg",
+      seoTitle: "Birthday Decoration Bahria Town Islamabad & Rawalpindi | AR Events Co.",
+      seoDescription: "Top-rated birthday decoration service in Bahria Town Phases 1-8. Custom backdrops, balloon architecture, cakes & photography with on-time delivery.",
+      focusKeyword: "birthday decoration Bahria Town",
+      secondaryKeywords: JSON.stringify(["birthday planner Bahria Town Phase 7", "birthday party Bahria Town Phase 4", "balloon arch Bahria Town"]),
+      canonicalUrl: "https://areventsco.com/locations/bahria-town",
+      ogImage: "/images/themes/theme_royal_midnight_prince.jpg",
+      sortOrder: 3,
+    },
+    {
+      slug: "dha-islamabad",
+      name: "DHA Islamabad & Rawalpindi",
+      city: "Islamabad",
+      headline: "Signature Birthday Event Decor in DHA Islamabad (Phases 1–5)",
+      subheadline: "High-end party styling in DHA Phase 1, Phase 2, Phase 3, Phase 5 & DHA Valley.",
+      introContent: "Exquisite birthday party decoration for residences, terraces, and clubhouses across DHA Islamabad. Our design team curates high-aesthetic color palettes, mirror acrylic pedestals, floral runners, and professional stage sound tailored for milestone celebrations.",
+      coverageAreas: JSON.stringify(["DHA Phase 1", "DHA Phase 2 (Sector A to J)", "DHA Phase 3", "DHA Phase 5", "DHA Valley", "DHA Phase 2 Extension"]),
+      featuredImage: "/images/themes/theme_dusty_rose_bunny.jpg",
+      seoTitle: "Birthday Decoration DHA Islamabad & Rawalpindi | AR Events Co.",
+      seoDescription: "Luxury birthday decoration in DHA Islamabad Phases 1, 2, 3, 5. Thematic 3D backdrops, marquee light numbers & high-end balloon styling.",
+      focusKeyword: "birthday decoration DHA Islamabad",
+      secondaryKeywords: JSON.stringify(["birthday planners DHA Islamabad", "kids party DHA Phase 2", "event decorators DHA Rawalpindi"]),
+      canonicalUrl: "https://areventsco.com/locations/dha-islamabad",
+      ogImage: "/images/themes/theme_dusty_rose_bunny.jpg",
+      sortOrder: 4,
+    },
+  ];
+
+  for (const loc of locationPagesData) {
+    await prisma.locationPage.create({ data: loc });
+  }
+  console.log("✅ Seed Location Pages created successfully.");
+
+  // 15. CREATE 301 REDIRECTS
+  const redirectsData = [
+    {
+      fromPath: "/birthday-decorations",
+      toPath: "/services",
+      statusCode: 301,
+      notes: "Legacy URL redirect to Services catalog",
+    },
+    {
+      fromPath: "/birthday-planner-islamabad",
+      toPath: "/locations/islamabad",
+      statusCode: 301,
+      notes: "Localized keyword shortcut to Islamabad hub",
+    },
+    {
+      fromPath: "/birthday-planner-rawalpindi",
+      toPath: "/locations/rawalpindi",
+      statusCode: 301,
+      notes: "Localized keyword shortcut to Rawalpindi hub",
+    },
+    {
+      fromPath: "/birthday-themes",
+      toPath: "/themes",
+      statusCode: 301,
+      notes: "Theme shortcut redirect",
+    },
+  ];
+
+  for (const red of redirectsData) {
+    await prisma.redirect.create({ data: red });
+  }
+  console.log("✅ Seed Redirects created successfully.");
+
+  // 16. CREATE CORE CMS PAGES WITH SEO
+  const corePages = [
+    {
+      slug: "home",
+      title: "Home",
+      metaTitle: "Birthday Decoration in Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "AR Events Co. is Islamabad and Rawalpindi's premier luxury birthday decoration and event planning company. Book custom themes, balloon decor, backdrops, and party packages online.",
+      focusKeyword: "birthday decoration Islamabad",
+      canonicalUrl: "https://areventsco.com",
+    },
+    {
+      slug: "packages",
+      title: "Birthday Packages",
+      metaTitle: "Birthday Decoration Packages in Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "Explore all-inclusive birthday decoration packages with transparent pricing in PKR. Luxury 3D backdrops, balloon styling, cakes, photography, and setup included.",
+      focusKeyword: "birthday decoration packages Islamabad",
+      canonicalUrl: "https://areventsco.com/packages",
+    },
+    {
+      slug: "themes",
+      title: "Birthday Themes",
+      metaTitle: "Birthday Decoration Themes & Ideas in Islamabad | AR Events Co.",
+      metaDescription: "Browse over 8 bespoke birthday themes: Lavender Princess, Jungle Safari, Sunflower Sunshine, Vintage Racer, and Royal Midnight Prince in Islamabad & Rawalpindi.",
+      focusKeyword: "birthday themes Islamabad",
+      canonicalUrl: "https://areventsco.com/themes",
+    },
+    {
+      slug: "services",
+      title: "Services",
+      metaTitle: "Birthday Event Services in Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "A la carte birthday services: Photography, 4K Videography, Custom Fondant Cakes, Magic Shows, Balloon Garlands, and Sound Systems across Islamabad & Rawalpindi.",
+      focusKeyword: "birthday services Islamabad",
+      canonicalUrl: "https://areventsco.com/services",
+    },
+    {
+      slug: "venues",
+      title: "Partner Venues",
+      metaTitle: "Birthday Party Venues in Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "Top partner birthday venues and banquet halls in Islamabad & Rawalpindi, plus turnkey private home and farmhouse decoration services.",
+      focusKeyword: "birthday party venues Islamabad",
+      canonicalUrl: "https://areventsco.com/venues",
+    },
+    {
+      slug: "gallery",
+      title: "Celebration Gallery",
+      metaTitle: "Real Birthday Decoration Gallery in Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "View real event photos of our luxury birthday setups, balloon arches, and marquee numbers delivered across Islamabad and Rawalpindi.",
+      focusKeyword: "birthday decoration ideas Islamabad",
+      canonicalUrl: "https://areventsco.com/gallery",
+    },
+    {
+      slug: "faq",
+      title: "Frequently Asked Questions",
+      metaTitle: "Birthday Planning FAQs Islamabad & Rawalpindi | AR Events Co.",
+      metaDescription: "Answers to common questions about birthday planning, advance booking notice, package customization, payment terms, and twin cities coverage.",
+      focusKeyword: "birthday event planner FAQs",
+      canonicalUrl: "https://areventsco.com/faq",
+    },
+  ];
+
+  for (const page of corePages) {
+    await prisma.page.create({
+      data: {
+        slug: page.slug,
+        title: page.title,
+        metaTitle: page.metaTitle,
+        metaDescription: page.metaDescription,
+        focusKeyword: page.focusKeyword,
+        canonicalUrl: page.canonicalUrl,
+        isPublished: true,
+      },
+    });
+  }
+  console.log("✅ Seed Core CMS Pages with SEO created successfully.");
+
+  // 17. CREATE GLOBAL SEO SETTINGS
+  const seoSettings = [
+    { key: "seo_site_title", value: "AR Events Co. | Premium Birthday & Event Planning Islamabad & Rawalpindi", group: "seo" },
+    { key: "seo_default_description", value: "Your Celebration, Our Passion. Islamabad and Rawalpindi's premier luxury birthday decoration and event styling service.", group: "seo" },
+    { key: "seo_canonical_domain", value: "https://areventsco.com", group: "seo" },
+    { key: "seo_default_og_image", value: "/images/hero/hero_birthday_lawn.jpg", group: "seo" },
+    { key: "seo_business_name", value: "AR Events Co.", group: "seo" },
+    { key: "seo_business_phone", value: "+92 300 8555123", group: "seo" },
+    { key: "seo_business_whatsapp", value: "+92 300 8555123", group: "seo" },
+    { key: "seo_business_email", value: "info@areventsco.com", group: "seo" },
+    { key: "seo_business_address", value: "Sector F-7 / Blue Area & Bahria Town Phase 7", group: "seo" },
+    { key: "seo_business_city", value: "Islamabad", group: "seo" },
+    { key: "seo_geo_lat", value: "33.7294", group: "seo" },
+    { key: "seo_geo_lng", value: "73.0931", group: "seo" },
+    { key: "seo_opening_hours", value: "Mo-Su 10:00-22:00", group: "seo" },
+    { key: "seo_google_site_verification", value: "google-site-verification-token", group: "seo" },
+  ];
+
+  for (const s of seoSettings) {
+    await prisma.setting.create({
+      data: {
+        key: s.key,
+        value: s.value,
+        group: s.group,
+        isPublic: true,
+      },
+    });
+  }
+  console.log("✅ Seed Global SEO Settings created successfully.");
 
   console.log("🚀 Complete Database Seeding Finished Successfully!");
 }

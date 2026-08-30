@@ -306,19 +306,43 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
   const theme = dbTheme
     ? {
-        title: dbTheme.title,
-        description: dbTheme.description,
-        includedDecor: ["Full Custom Backdrop", "Organic Balloon Arch", "Cake Pedestals"],
-        startingPriceMinor: 4500000,
+        title: dbTheme.seoTitle || `${dbTheme.title} Birthday Theme in Islamabad & Rawalpindi | AR Events Co.`,
+        description: dbTheme.seoDescription || dbTheme.description,
+        focusKeyword: dbTheme.focusKeyword || `${dbTheme.title} birthday theme Islamabad`,
+        canonicalUrl: dbTheme.canonicalUrl || `/themes/${dbTheme.slug}`,
+        ogImage: dbTheme.ogImage || dbTheme.heroImage || "/images/hero/hero_birthday_lawn.jpg",
+        noIndex: dbTheme.noIndex,
+        noFollow: dbTheme.noFollow,
       }
-    : STATIC_THEMES[params.slug];
+    : STATIC_THEMES[params.slug]
+    ? {
+        title: `${STATIC_THEMES[params.slug].title} Birthday Theme in Islamabad & Rawalpindi | AR Events Co.`,
+        description: STATIC_THEMES[params.slug].description,
+        focusKeyword: `${STATIC_THEMES[params.slug].title} theme Islamabad`,
+        canonicalUrl: `/themes/${STATIC_THEMES[params.slug].slug}`,
+        ogImage: STATIC_THEMES[params.slug].heroImage,
+        noIndex: false,
+        noFollow: false,
+      }
+    : null;
 
   if (!theme) return { title: "Theme Not Found | AR Events Co." };
 
-  return {
-    title: `${theme.title} Birthday Decoration Setup Islamabad & Rawalpindi | AR Events Co.`,
-    description: `Book the ${theme.title} birthday theme in Islamabad & Rawalpindi. Starting from ${formatPKR(theme.startingPriceMinor)}.`,
-  };
+  const { constructMetadata } = await import("@/lib/seo");
+  return constructMetadata({
+    title: theme.title,
+    description: theme.description,
+    canonicalPath: theme.canonicalUrl,
+    ogImage: theme.ogImage,
+    noIndex: theme.noIndex,
+    noFollow: theme.noFollow,
+    keywords: [
+      theme.focusKeyword,
+      "birthday themes Islamabad",
+      "birthday decoration Rawalpindi",
+      "kids party styling Islamabad",
+    ],
+  });
 }
 
 export default async function ThemeDetailPage({ params }: { params: { slug: string } }) {

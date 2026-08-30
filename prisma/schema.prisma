@@ -82,6 +82,20 @@ model Package {
   isFeatured      Boolean          @default(false)
   isActive        Boolean          @default(true)
   sortOrder       Int              @default(0)
+
+  // SEO & Open Graph Metadata
+  seoTitle        String?
+  seoDescription  String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
+
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -101,6 +115,20 @@ model Theme {
   isPopular       Boolean          @default(false)
   isActive        Boolean          @default(true)
   sortOrder       Int              @default(0)
+
+  // SEO & Open Graph Metadata
+  seoTitle        String?
+  seoDescription  String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
+
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -119,6 +147,20 @@ model Service {
   image           String?
   isActive        Boolean          @default(true)
   sortOrder       Int              @default(0)
+
+  // SEO & Open Graph Metadata
+  seoTitle        String?
+  seoDescription  String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
+
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -151,6 +193,20 @@ model Venue {
   images          String?          // JSON array
   description     String?
   isActive        Boolean          @default(true)
+
+  // SEO & Open Graph Metadata
+  seoTitle        String?
+  seoDescription  String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
+
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -333,6 +389,15 @@ model Page {
   title           String
   metaTitle       String?
   metaDescription String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
   isPublished     Boolean          @default(true)
   publishedAt     DateTime?
   createdAt       DateTime         @default(now())
@@ -516,5 +581,62 @@ model Team {
   notes           String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+}
+
+// ----------------------------------------------------
+// 8. LOCAL SEO, REDIRECTS & SEO AUDITING
+// ----------------------------------------------------
+
+model LocationPage {
+  id              String           @id @default(cuid())
+  slug            String           @unique // "islamabad", "rawalpindi", "bahria-town", "dha-islamabad"
+  name            String           // "Islamabad", "Rawalpindi", "Bahria Town", "DHA Islamabad"
+  city            String           // "Islamabad" or "Rawalpindi"
+  headline        String
+  subheadline     String?
+  introContent    String           // Rich descriptive content about local party styling
+  coverageAreas   String           // JSON array e.g. ["F-6", "F-7", "F-8", "E-11", "Chak Shahzad"]
+  featuredImage   String?
+  sortOrder       Int              @default(0)
+  isActive        Boolean          @default(true)
+
+  // SEO & Open Graph Metadata
+  seoTitle        String?
+  seoDescription  String?
+  focusKeyword    String?
+  secondaryKeywords String?
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+  noIndex         Boolean          @default(false)
+  noFollow        Boolean          @default(false)
+  structuredData  String?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Redirect {
+  id              String           @id @default(cuid())
+  fromPath        String           @unique
+  toPath          String
+  statusCode      Int              @default(301) // 301 (Permanent), 302 (Temporary)
+  isActive        Boolean          @default(true)
+  hitCount        Int              @default(0)
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model SeoAuditLog {
+  id              String           @id @default(cuid())
+  entityType      String           // "Page", "Package", "Theme", "Service", "Venue", "Location", "Global"
+  entityId        String
+  fieldName       String           // "seoTitle", "seoDescription", "canonicalUrl", "noIndex"
+  oldValue        String?
+  newValue        String?
+  changedBy       String?
+  createdAt       DateTime         @default(now())
 }
 
