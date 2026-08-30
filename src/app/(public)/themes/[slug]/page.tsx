@@ -442,7 +442,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
 
             {/* Gallery Thumbnails */}
             <div className="grid grid-cols-3 gap-3">
-              {theme.gallery.map((img, idx) => (
+              {theme.gallery.map((img: string, idx: number) => (
                 <div
                   key={idx}
                   className="relative h-24 sm:h-32 rounded-xl overflow-hidden border border-brand-warm-200 cursor-pointer group"
@@ -496,7 +496,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
                   Curated Color Palette:
                 </span>
                 <div className="flex items-center space-x-2.5">
-                  {theme.colorPalette.map((hex, i) => (
+                  {theme.colorPalette.map((hex: string, i: number) => (
                     <div key={i} className="flex items-center space-x-1.5" title={theme.colorNames[i]}>
                       <span
                         className="w-6 h-6 rounded-full border-2 border-white shadow-sm inline-block"
@@ -561,7 +561,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {theme.includedDecor.map((item, idx) => (
+              {theme.includedDecor.map((item: string, idx: number) => (
                 <div key={idx} className="flex items-start space-x-3 p-3.5 bg-brand-warm-50/70 rounded-xl border border-brand-warm-200">
                   <CheckCircle2 className="w-5 h-5 text-brand-gold-600 shrink-0 mt-0.5" />
                   <span className="text-sm font-medium text-brand-navy-900">{item}</span>
@@ -581,7 +581,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
               </h3>
             </div>
             <div className="space-y-3.5 border-t border-brand-navy-800 pt-4">
-              {theme.specifications.map((spec, i) => (
+              {theme.specifications.map((spec: { label: string; value: string }, i: number) => (
                 <div key={i} className="flex justify-between items-center text-xs sm:text-sm py-1 border-b border-brand-navy-900/60 pb-2">
                   <span className="text-brand-navy-300 font-medium">{spec.label}</span>
                   <span className="text-white font-semibold text-right max-w-[200px]">{spec.value}</span>
@@ -656,7 +656,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
               <div>
                 <div className="relative h-48 w-full overflow-hidden">
                   <Image
-                    src={t.heroImage}
+                    src={t.image}
                     alt={t.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -669,7 +669,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
                 </div>
                 <div className="p-5 space-y-2">
                   <h4 className="font-serif text-lg font-bold text-brand-navy-950">{t.title}</h4>
-                  <p className="text-xs text-brand-navy-600 line-clamp-2">{t.description}</p>
+                  <p className="text-xs text-brand-navy-600 line-clamp-2">{t.category} Theme</p>
                 </div>
               </div>
               <div className="p-5 pt-0 flex items-center justify-between border-t border-brand-warm-200/80 mt-2">
