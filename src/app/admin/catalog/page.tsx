@@ -3,6 +3,8 @@ import { formatPKR } from "@/lib/utils";
 import { Sparkles, Layers, MapPin, Plus } from "lucide-react";
 import Image from "next/image";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Catalog Management | AR Events Co.",
 };

@@ -3,6 +3,8 @@ import { formatDate, formatTime12H } from "@/lib/utils";
 import { Calendar as CalendarIcon, MapPin, Users, Sparkles } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Operations Schedule & Calendar | AR Events Co.",
 };

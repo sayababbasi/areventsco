@@ -13,6 +13,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Client Portal Dashboard | AR Events Co.",
   description: "View and manage your birthday bookings, status, and invoices.",

@@ -41,4 +41,6 @@ next-env.d.ts
 *.sqlite3
 
 # Removing Docs
-docs
+docs/
+/docs
+/docs/*
