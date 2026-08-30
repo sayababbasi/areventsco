@@ -2,10 +2,11 @@ import crypto from "crypto";
 // @ts-ignore
 import { Safepay } from "@sfpy/node-sdk";
 import { SafepayTrackerData } from "./types";
+import { toSafepayAmount } from "./currency";
 
 const SAFEPAY_ENVIRONMENT = (process.env.SAFEPAY_ENVIRONMENT || "sandbox").toLowerCase() as any;
 const SAFEPAY_API_KEY = process.env.SAFEPAY_API_KEY || "sec_8f267889-2ac1-401b-99b1-e5f002f695af";
-const SAFEPAY_SECRET_KEY = process.env.SAFEPAY_SECRET_KEY || "26f25765f46eaa6e4cee363b8966988637cbdf05958766feef038507eabecb17";
+const SAFEPAY_SECRET_KEY = process.env.SAFEPAY_SECRET_KEY || "fb0f4a6c5517e05c37b1901ff05b95982051efdd2a197e411516baf40c47acff";
 const SAFEPAY_WEBHOOK_SECRET = process.env.SAFEPAY_WEBHOOK_SECRET || SAFEPAY_SECRET_KEY;
 
 const BASE_API_URL =
@@ -30,16 +31,17 @@ function getSafepayClient() {
 export class SafepayGateway {
   /**
    * Create a Safepay payment tracker token
-   * @param amountMinor Amount in minor currency units (Paisa). e.g. PKR 34,200 = 3,420,000 minor units
+   * @param amountMinor Amount in database minor currency units (Paisa). e.g. PKR 31,800 = 3,180,000 minor units
    * @param currency Currency code, defaults to PKR
    */
   static async createTracker(amountMinor: number, currency: string = "PKR"): Promise<{ token: string; raw: any }> {
     try {
       const client = getSafepayClient();
-      console.log(`[SAFEPAY] Creating tracker for amountMinor=${amountMinor} ${currency} in env=${SAFEPAY_ENVIRONMENT}`);
+      const amountInPkr = toSafepayAmount(amountMinor);
+      console.log(`[SAFEPAY] Creating tracker for amountMinor=${amountMinor} -> amountInPkr=${amountInPkr} ${currency} in env=${SAFEPAY_ENVIRONMENT}`);
       
       const payment = await client.payments.create({
-        amount: amountMinor,
+        amount: amountInPkr,
         currency: currency.toUpperCase(),
       });
 
@@ -47,7 +49,7 @@ export class SafepayGateway {
         throw new Error("Failed to obtain tracker token from Safepay API");
       }
 
-      console.log(`[SAFEPAY] Tracker created successfully. Token: ${payment.token}`);
+      console.log(`[SAFEPAY] Tracker created successfully. Token: ${payment.token} (Amount: PKR ${payment.amount})`);
       return { token: payment.token, raw: payment };
     } catch (error: any) {
       console.error("[SAFEPAY] Tracker creation failed:", error?.message || error);

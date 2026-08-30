@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { SafepayGateway } from "./safepay";
 import { CreatePaymentSessionParams, PaymentSessionResult, WebhookProcessingResult } from "./types";
+import { toSafepayAmount } from "./currency";
 
 export class PaymentService {
   /**
@@ -272,7 +273,32 @@ export class PaymentService {
       };
     }
 
-    // 5. Evaluate completion state
+    // 5. Strict Amount Reconciliation Check
+    if (data.amount !== undefined && data.amount !== null) {
+      const expectedPkr = toSafepayAmount(payment.amountMinor);
+      const receivedPkr = Number(data.amount);
+      if (Math.abs(receivedPkr - expectedPkr) > 0.01) {
+        console.error(`[PAYMENT-SERVICE] ⚠ AMOUNT MISMATCH for payment ${payment.id}! Expected PKR ${expectedPkr}, but Safepay reported PKR ${receivedPkr}`);
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: {
+            status: "FAILED",
+            failureReason: `PAYMENT_AMOUNT_MISMATCH: Expected PKR ${expectedPkr}, received PKR ${receivedPkr}`,
+            metadata: JSON.stringify(payload),
+          },
+        });
+
+        return {
+          received: true,
+          processed: false,
+          paymentId: payment.id,
+          status: "FAILED",
+          error: `PAYMENT_AMOUNT_MISMATCH: Expected PKR ${expectedPkr}, got PKR ${receivedPkr}`,
+        };
+      }
+    }
+
+    // 6. Evaluate completion state
     const isSuccess =
       trackerState === "TRACKER_ENDED" ||
       trackerState === "PAID" ||
@@ -320,6 +346,57 @@ export class PaymentService {
   }
 
   /**
+   * Get live database payment status for a booking
+   */
+  static async getBookingPaymentStatus(reference: string) {
+    const booking = await prisma.booking.findUnique({
+      where: { reference },
+      include: {
+        customer: { include: { user: true } },
+        invoices: {
+          include: { items: true, payments: true, auditLogs: { orderBy: { createdAt: "desc" } } },
+          orderBy: { createdAt: "desc" },
+        },
+        payments: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
+
+    if (!booking) {
+      return null;
+    }
+
+    const totalMinor = booking.totalAmountMinor;
+    const paidMinor = booking.amountPaidMinor;
+    const balanceMinor = Math.max(0, totalMinor - paidMinor);
+    const depositRequiredMinor =
+      booking.depositRequiredMinor > 0
+        ? booking.depositRequiredMinor
+        : Math.round(totalMinor * 0.3);
+
+    const isFullyPaid = paidMinor >= totalMinor && totalMinor > 0;
+    const isAdvancePaid = paidMinor >= depositRequiredMinor && depositRequiredMinor > 0;
+
+    return {
+      reference: booking.reference,
+      status: booking.status,
+      totalAmountMinor: totalMinor,
+      totalAmountPkr: toSafepayAmount(totalMinor),
+      amountPaidMinor: paidMinor,
+      amountPaidPkr: toSafepayAmount(paidMinor),
+      balanceDueMinor: balanceMinor,
+      balanceDuePkr: toSafepayAmount(balanceMinor),
+      depositRequiredMinor,
+      depositRequiredPkr: toSafepayAmount(depositRequiredMinor),
+      isFullyPaid,
+      isAdvancePaid,
+      invoice: booking.invoices[0] || null,
+      payments: booking.payments,
+    };
+  }
+
+  /**
    * Verify a payment via direct Safepay API query and reconcile database
    */
   static async verifyAndSyncTracker(token: string): Promise<{ success: boolean; status: string; payment?: any; error?: string }> {
@@ -351,7 +428,25 @@ export class PaymentService {
       return { success: true, status: payment.status, payment };
     }
 
-    // 4. If Safepay confirms tracker ended / paid, reconcile
+    // 4. Strict Amount Reconciliation
+    if (tracker.amount !== undefined && tracker.amount !== null) {
+      const expectedPkr = toSafepayAmount(payment.amountMinor);
+      const receivedPkr = Number(tracker.amount);
+      if (Math.abs(receivedPkr - expectedPkr) > 0.01) {
+        console.error(`[PAYMENT-SERVICE] ⚠ Tracker amount mismatch for ${token}! Expected PKR ${expectedPkr}, got PKR ${receivedPkr}`);
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: {
+            status: "FAILED",
+            failureReason: `PAYMENT_AMOUNT_MISMATCH: Expected PKR ${expectedPkr}, got PKR ${receivedPkr}`,
+            metadata: JSON.stringify(tracker),
+          },
+        });
+        return { success: false, status: "FAILED", error: "PAYMENT_AMOUNT_MISMATCH" };
+      }
+    }
+
+    // 5. If Safepay confirms tracker ended / paid, reconcile
     const isCompleted = tracker.state === "TRACKER_ENDED" || tracker.state === "PAID";
     if (isCompleted) {
       const transactionId = tracker.transaction?.id || `sp_${Date.now()}`;

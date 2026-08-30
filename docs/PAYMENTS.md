@@ -1,119 +1,120 @@
-# 💳 Safepay Sandbox & Production Payments Integration
+# 💳 Production Safepay Payments Integration & Architecture — AR Events Co.
 
-This document outlines the official payment architecture, gateway configuration, environment variables, transaction lifecycles, and security protocols for **AR Events Co.**
+This document outlines the official payment architecture, monetary unit conversion invariants, gateway configuration, environment variables, transaction lifecycles, and security protocols for **AR Events Co.**
 
 ---
 
-## 1. Gateway Overview
-- **Payment Provider**: [Safepay](https://getsafepay.com/) (Official Node.js SDK `@sfpy/node-sdk`)
-- **Supported Payment Methods**:
-  - Visa / MasterCard Debit & Credit Cards
-  - UnionPay & PayPak Cards
-  - 256-Bit SSL 3D-Secure 2.0 Authenticated Checkout
-- **Currency**: Pakistani Rupee (`PKR`)
-- **Monetary Unit Representation**: All monetary values are handled and stored in integer Paisa (1 PKR = 100 Paisa) to prevent floating-point precision errors.
+## 1. Root Cause & Resolution of the PKR 3,180,000 Amount Bug
+
+### The Issue
+Previously, for an advance deposit of **PKR 31,800**, the Safepay checkout screen was displaying **PKR 3,180,000** (a 100x discrepancy).
+
+### Root Cause
+1. **Internal Canonical Storage**: PostgreSQL Supabase stores all monetary amounts in **integer Minor Units (Paisa)**:
+   $$\text{1 PKR} = \text{100 Paisa}$$
+   - PKR 31,800 is stored in PostgreSQL as `3,180,000` Paisa.
+   - PKR 106,000 is stored in PostgreSQL as `10,600,000` Paisa.
+2. **Safepay SDK / API Expectation**: The official Safepay Node SDK (`@sfpy/node-sdk`) `client.payments.create({ amount, currency })` API expects the amount in **STANDARD PKR (Rupees)**, NOT minor units.
+3. When `3180000` was passed directly into `client.payments.create`, Safepay treated it as `PKR 3,180,000`.
+
+### Solution: Centralized Monetary Conversion Boundary
+We introduced a strict, authoritative converter utility ([`src/lib/payments/currency.ts`](file:///d:/Business/Revotic%20AI%20Pvt%20Ltd/Development/Under%20Developing/Revotic%20AI%20Development/AR%20Event%20Co/src/lib/payments/currency.ts)):
+- **`toSafepayAmount(amountMinor: number): number`** $\rightarrow$ divides database minor units by 100 to yield standard PKR before sending to Safepay.
+  - `3,180,000 Paisa` $\rightarrow$ `31,800 PKR`
+  - `10,600,000 Paisa` $\rightarrow$ `106,000 PKR`
+- **`fromSafepayAmount(safepayAmount: number): number`** $\rightarrow$ multiplies Safepay standard PKR by 100 before storing in PostgreSQL.
+  - `31,800 PKR` $\rightarrow$ `3,180,000 Paisa`
+- **Strict Reconciliation**: Webhooks and active tracker queries compare `receivedPkr` against `toSafepayAmount(payment.amountMinor)`. Any discrepancy $> 0.01$ immediately triggers `PAYMENT_AMOUNT_MISMATCH` and stops reconciliation.
 
 ---
 
 ## 2. Environment Variables
 
-Add the following environment variables to your deployment environment (e.g. Vercel Project Settings) and `.env`:
+Configure the following variables in your hosting environment (e.g. Vercel Project Settings) and local `.env`:
 
 ```env
 # ------------------------------------------------------------------------------
-# SAFEPAY ONLINE PAYMENTS (SANDBOX / PRODUCTION)
+# SAFEPAY SANDBOX & PRODUCTION GATEWAY
 # ------------------------------------------------------------------------------
 SAFEPAY_ENVIRONMENT="sandbox" # Set to "production" when launching live
 SAFEPAY_API_KEY="sec_8f267889-2ac1-401b-99b1-e5f002f695af"
-SAFEPAY_SECRET_KEY="26f25765f46eaa6e4cee363b8966988637cbdf05958766feef038507eabecb17"
-SAFEPAY_WEBHOOK_SECRET="26f25765f46eaa6e4cee363b8966988637cbdf05958766feef038507eabecb17"
+SAFEPAY_SECRET_KEY="fb0f4a6c5517e05c37b1901ff05b95982051efdd2a197e411516baf40c47acff"
+SAFEPAY_WEBHOOK_SECRET="fb0f4a6c5517e05c37b1901ff05b95982051efdd2a197e411516baf40c47acff"
 
-# Public App URL for Checkout Redirects
+# Public App Base URL for Callbacks
 NEXT_PUBLIC_APP_URL="https://areventsco.com"
 ```
 
 > [!WARNING]
-> Never commit real production secrets to Git. Keep `SAFEPAY_SECRET_KEY` and `SAFEPAY_WEBHOOK_SECRET` strictly on the server-side.
+> `SAFEPAY_SECRET_KEY` and `SAFEPAY_WEBHOOK_SECRET` must **NEVER** be exposed to client bundles or prefixed with `NEXT_PUBLIC_`.
 
 ---
 
-## 3. Architecture & Separation of Concerns
+## 3. Embedded Checkout Experience
+
+Instead of redirecting users away to an external webpage, the customer checkout experience is embedded directly on the booking page:
+1. **Interactive Payment Card ([`SafepayPaymentCard.tsx`](file:///d:/Business/Revotic%20AI%20Pvt%20Ltd/Development/Under%20Developing/Revotic%20AI%20Development/AR%20Event%20Co/src/components/booking/SafepayPaymentCard.tsx))**:
+   - Double-click protection: buttons disable immediately on click and display `Preparing Secure Checkout...`.
+   - Option 1: **"Pay Advance Deposit — PKR 31,800"** (30% deposit).
+   - Option 2: **"Pay Full Amount Online — PKR 106,000"** (100% balance).
+2. **Embedded Safepay Modal Window**:
+   - Renders a responsive, backdrop-blurred overlay containing an embedded 256-bit SSL iframe directly loading the Safepay checkout flow.
+   - Listens to postMessage event notifications from Safepay.
+   - Polls `GET /api/bookings/[reference]/payment-status` in real time.
+3. **Post-Payment Transition**:
+   - Upon payment confirmation, the modal dismisses automatically.
+   - The booking page instantly updates with the transaction reference, payment badge, and **"Download Official Invoice (PDF)"** action.
+   - The payment button dynamically morphs into **"Pay Remaining Balance — PKR 74,200"** (if advance was paid) or displays **"PAID IN FULL"** with no further active payment buttons.
+
+---
+
+## 4. End-to-End Architecture Flow
 
 ```mermaid
-graph TD
-    A[Client Booking Portal] -->|1. Request Advance / Balance| B[POST /api/payments/safepay/create-session]
-    B -->|2. Authoritative Recalculation| C[PaymentService]
-    C -->|3. Create Tracker Token| D[SafepayGateway / @sfpy/node-sdk]
-    D -->|4. Hosted Checkout URL| A
-    A -->|5. Redirect Customer| E[Safepay Hosted Checkout Window]
-    E -->|6. Card 3DS Processing| F[Safepay Gateway]
-    F -->|7. HMAC Webhook Notification| G[POST /api/payments/safepay/webhook]
-    G -->|8. Verify Signature & Idempotency| C
-    C -->|9. Atomic Transaction Update| H[(Supabase PostgreSQL)]
-    H -->|Payment = PAID| I[Booking Confirmed & Invoice Reconciled]
+sequenceDiagram
+    autonumber
+    actor Customer as Customer (Browser)
+    participant UI as SafepayPaymentCard
+    participant API as /api/payments/safepay/create-session
+    participant Svc as PaymentService
+    participant DB as PostgreSQL (Supabase)
+    participant SP as Safepay Gateway (Sandbox)
+    participant WH as /api/payments/safepay/webhook
+
+    Customer->>UI: Click "Pay Advance Deposit (PKR 31,800)"
+    UI->>API: POST { bookingReference, paymentType: "ADVANCE" }
+    API->>Svc: createPaymentSession()
+    Note over Svc,DB: Server authoritatively computes 31,800 PKR from DB
+    Svc->>SP: client.payments.create({ amount: 31800, currency: "PKR" })
+    SP-->>Svc: { token: "track_xxx", amount: 31800 }
+    Svc->>DB: INSERT Payment(status: "PENDING", token: "track_xxx", amountMinor: 3180000)
+    Svc-->>UI: { checkoutUrl: "https://sandbox.api.getsafepay.com/checkout/pay?beacon=track_xxx" }
+    UI->>UI: Open Embedded Checkout Modal
+    Customer->>SP: Enter Card Details & Complete 3DS in Modal
+    SP->>WH: POST Webhook { event: "payment.completed", token: "track_xxx", amount: 31800 }
+    Note over WH: Verify HMAC-SHA256 Signature
+    WH->>Svc: processWebhook()
+    Note over Svc: Check Idempotency & Amount Match
+    Svc->>DB: TX: Payment=PAID, Booking=CONFIRMED (paid=31800, due=74200), Invoice=PARTIALLY_PAID
+    WH-->>SP: HTTP 200 OK
+    UI->>UI: Real-Time Polling detects DB update
+    UI->>Customer: Close Modal & Render "✓ Advance Deposit Paid"
 ```
-
-### Key Modules:
-- **`src/lib/payments/safepay.ts`**: Pure provider wrapper for `@sfpy/node-sdk`, tracker creation, hosted URL builder, and HMAC-SHA256 signature verification.
-- **`src/lib/payments/payment-service.ts`**: High-level payment orchestration handling amount calculation, database transactions, idempotency checks, booking state transitions, and invoice audit logging.
-- **`src/app/api/payments/safepay/create-session/route.ts`**: Checkout session initiator.
-- **`src/app/api/payments/safepay/webhook/route.ts`**: Webhook event receiver.
-- **`src/app/api/payments/safepay/verify/route.ts`**: Active gateway verification endpoint.
-
----
-
-## 4. End-to-End Payment Lifecycle
-
-1. **Booking Initiated**: Customer creates a booking for a birthday package/theme.
-2. **Authoritative Server Pricing**: The system calculates the total amount (e.g., PKR 114,000) and the required 30% advance deposit (PKR 34,200).
-3. **Session Initialized**: Customer clicks **"Pay Advance Deposit (PKR 34,200)"** on `/booking/[reference]`.
-   - `PaymentService` creates a `Payment` record in state `PENDING` with tracker token `track_xxx`.
-   - Returns hosted checkout URL: `https://sandbox.api.getsafepay.com/checkout/pay?beacon=track_xxx...`
-4. **Checkout Execution**: Customer completes 3D-secure card authentication on Safepay.
-5. **Webhook Confirmation**:
-   - Safepay posts webhook event (`payment.completed`) to `/api/payments/safepay/webhook` with `x-sfpy-signature`.
-   - Server validates HMAC-SHA256 signature.
-   - Atomically updates:
-     - `Payment.status = "PAID"`
-     - `Booking.amountPaidMinor += payment.amountMinor`
-     - `Booking.status = "CONFIRMED"`
-     - `Invoice.amountPaidMinor += payment.amountMinor`
-     - `Invoice.status = "PARTIALLY_PAID" | "PAID"`
-     - `InvoiceAuditLog` created with action `PAYMENT_RECORDED`.
-6. **Customer Return**:
-   - Redirects customer back to `/booking/[reference]?payment=success&token=track_xxx`.
-   - Frontend verifies confirmation and renders the official verified digital receipt with **"Download Official Invoice (PDF)"** action.
 
 ---
 
 ## 5. Security & Idempotency Rules
 
-- **Zero Trust on Frontend Amounts**: The payment amount is **always** recalculated server-side directly from the database booking record. No frontend payload or URL parameter can alter the payable amount.
-- **Idempotent Webhooks**: If Safepay sends duplicate webhook notifications for the same transaction, the handler verifies whether `Payment.status` is already `PAID` and returns HTTP 200 without executing duplicate database adjustments.
-- **HMAC Signature Verification**: All webhook requests must pass constant-time HMAC-SHA256 signature checks against `SAFEPAY_WEBHOOK_SECRET`.
-- **PCI-DSS Compliance**: Sensitive card numbers and CVVs are entered directly in Safepay's hosted PCI-DSS Level 1 environment. The AR Events Co. platform never receives or stores raw card data.
+- **Zero Client Trust**: The frontend only specifies `paymentType: "ADVANCE" | "BALANCE" | "FULL"`. The server queries the database and calculates the exact amount in minor units.
+- **Idempotency Guarantee**: The payment processing pipeline checks `if (payment.status === "PAID") return success;` before executing any database modifications, ensuring duplicate webhooks or concurrent redirect race conditions never double-count payments.
+- **HMAC-SHA256 Signature Verification**: Raw webhook request bodies are validated using constant-time comparison against `SAFEPAY_WEBHOOK_SECRET`.
+- **Amount Verification**: Payments with amount mismatches are marked `FAILED` with `failureReason: "PAYMENT_AMOUNT_MISMATCH"`.
 
 ---
 
-## 6. Admin Panel Management
+## 6. Admin Panel Reconciliation (`/admin/payments` & `/admin/payments/[id]`)
 
-Administrators have access to real-time payment reconciliation at `/admin/payments`:
-- **Financial Metrics**: Total Collected, Safepay Volume, Today's Revenue, This Month's Revenue.
-- **Transaction Table**: Filterable by Gateway (`Safepay`, `Bank Transfer`), Status (`PAID`, `PENDING`, `FAILED`), and search query.
-- **Dedicated Payment Workspace (`/admin/payments/[id]`)**:
-  - Full transaction overview.
-  - Linked Booking & Customer details.
-  - Linked Invoice breakdown.
-  - Read-only Safepay Gateway live tracker payload inspection.
-  - **"Verify with Gateway"** button to force live synchronization with Safepay servers.
-
----
-
-## 7. Transitioning from Sandbox to Production
-
-When Safepay approves production merchant onboarding and KYC:
-1. Set `SAFEPAY_ENVIRONMENT="production"` in Vercel.
-2. Update `SAFEPAY_API_KEY`, `SAFEPAY_SECRET_KEY`, and `SAFEPAY_WEBHOOK_SECRET` with live production credentials.
-3. Configure the Production Webhook URL in your Safepay Merchant Dashboard:
-   `https://areventsco.com/api/payments/safepay/webhook`
-4. Set `NEXT_PUBLIC_APP_URL="https://areventsco.com"`.
+Administrators have access to real-time payment audit tools:
+- **Financial Statistics Cards**: Total Volume, Safepay Collected, Today's Revenue, This Month's Revenue.
+- **Transaction Details**: Payment amount, expected amount vs gateway amount (`✓ MATCHED`), customer info, linked booking, and linked invoice.
+- **"Verify with Gateway" Button**: Forces live server-to-server query against Safepay API (`/order/v1/{token}`) to reconcile any pending transactions.
