@@ -23,6 +23,7 @@ import {
   RefreshCw,
   SlidersHorizontal,
 } from "lucide-react";
+import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
 
 interface Service {
@@ -532,13 +533,12 @@ export default function AdminServicesPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-brand-navy-900 mb-1">Image Asset Path</label>
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="/images/themes/theme_lavender_dream.jpg"
-                  className="w-full p-2.5 rounded-xl border border-brand-warm-300 focus:outline-none focus:border-brand-gold-500 bg-white"
+                <ImageUploadDropzone
+                  value={formData.image || ""}
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  folder="services"
+                  altText={formData.title || "AR Events Co Service"}
+                  label="Service Image (Supabase Storage)"
                 />
               </div>
 

@@ -311,7 +311,56 @@ async function main() {
   }
   console.log("✅ Seed Themes created successfully.");
 
-  // 5. CREATE SERVICES & ADD-ONS
+  // 5. CREATE SERVICES
+  const servicesData = [
+    {
+      slug: "luxury-balloon-installations",
+      title: "Luxury Organic Balloon Installations",
+      category: "Decoration",
+      description: "Custom color-matched balloon garlands, double-stuffed matte organic arches, balloon walls, and helium ceiling cascades.",
+      priceType: "FIXED",
+      basePriceMinor: 2500000, // PKR 25,000
+      image: "/images/themes/theme_sunflower_sunshine.jpg",
+      sortOrder: 1,
+    },
+    {
+      slug: "custom-backdrop-architecture",
+      title: "Custom 3D Backdrops & Shimmer Walls",
+      category: "Decoration",
+      description: "Curved velvet arches, acrylic boards with 3D personalized typography, iridescent shimmer panels, and slatted wood backdrops.",
+      priceType: "FIXED",
+      basePriceMinor: 3500000, // PKR 35,000
+      image: "/images/themes/theme_lavender_dream.jpg",
+      sortOrder: 2,
+    },
+    {
+      slug: "themed-cake-table-styling",
+      title: "Themed Cake Table & Pedestal Styling",
+      category: "Decoration",
+      description: "Fluted cylindrical pedestals, mirrored plinths, luxury cake stands, dessert carts, and matching floral accents.",
+      priceType: "FIXED",
+      basePriceMinor: 1800000, // PKR 18,000
+      image: "/images/themes/theme_dusty_rose_bunny.jpg",
+      sortOrder: 3,
+    },
+    {
+      slug: "marquee-illuminated-lighting",
+      title: "Illuminated Marquee Numbers & Ambient Lighting",
+      category: "Lighting",
+      description: "4-foot warm-bulb marquee letters and numbers, ambient LED uplighters, and neon celebration signage.",
+      priceType: "FIXED",
+      basePriceMinor: 1500000, // PKR 15,000
+      image: "/images/themes/theme_royal_midnight_prince.jpg",
+      sortOrder: 4,
+    },
+  ];
+
+  for (const s of servicesData) {
+    await prisma.service.create({ data: s });
+  }
+  console.log("✅ Seed Services created successfully.");
+
+  // 6. CREATE ADD-ONS
   const addonsData = [
     {
       slug: "pro-photography-3hr",

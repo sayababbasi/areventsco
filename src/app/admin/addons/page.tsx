@@ -17,6 +17,7 @@ import {
   Sparkles,
   Tag,
 } from "lucide-react";
+import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
 
 interface Addon {
@@ -485,6 +486,16 @@ export default function AdminAddonsPage() {
                   value={formData.pricePKR}
                   onChange={(e) => setFormData({ ...formData, pricePKR: Number(e.target.value) })}
                   className="w-full p-2.5 rounded-xl border border-brand-warm-300 focus:outline-none focus:border-brand-gold-500 bg-white"
+                />
+              </div>
+
+              <div>
+                <ImageUploadDropzone
+                  value={formData.image || ""}
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  folder="addons"
+                  altText={formData.title || "AR Events Co Add-on"}
+                  label="Add-on Image (Supabase Storage)"
                 />
               </div>
 

@@ -1,6 +1,53 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const AUTH_SECRET = process.env.AUTH_SECRET || "dev-super-secret-key-areventsco-secure-12345";
+
+async function verifyEdgeToken(token: string) {
+  try {
+    if (!token || typeof token !== "string") return null;
+    const parts = token.split(".");
+    if (parts.length !== 2) return null;
+    const [payloadB64, providedSig] = parts;
+
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(AUTH_SECRET),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+
+    // Convert base64url signature to Uint8Array
+    const sigBinary = atob(providedSig.replace(/-/g, "+").replace(/_/g, "/"));
+    const sigBytes = new Uint8Array(sigBinary.length);
+    for (let i = 0; i < sigBinary.length; i++) {
+      sigBytes[i] = sigBinary.charCodeAt(i);
+    }
+
+    const isValid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      sigBytes,
+      encoder.encode(payloadB64)
+    );
+
+    if (!isValid) return null;
+
+    const jsonStr = atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"));
+    const payload = JSON.parse(jsonStr);
+
+    if (payload.exp && Date.now() > payload.exp) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -25,22 +72,15 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Decode session payload safely in Edge middleware
-    try {
-      const [payloadB64] = sessionCookie.split(".");
-      if (!payloadB64) {
-        return NextResponse.redirect(new URL("/login", req.url));
-      }
+    const payload = await verifyEdgeToken(sessionCookie);
+    if (!payload) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-      const payload = JSON.parse(
-        Buffer.from(payloadB64, "base64url").toString("utf-8")
-      );
-
-      const allowedRoles = ["ADMIN", "SUPER_ADMIN", "EVENT_MANAGER", "STAFF"];
-      if (!payload.role || !allowedRoles.includes(payload.role)) {
-        return NextResponse.redirect(new URL("/login", req.url));
-      }
-    } catch {
+    const allowedRoles = ["ADMIN", "SUPER_ADMIN", "EVENT_MANAGER", "STAFF"];
+    if (!payload.role || !allowedRoles.includes(payload.role)) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
@@ -49,6 +89,13 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/dashboard")) {
     const sessionCookie = req.cookies.get("ar_session")?.value;
     if (!sessionCookie) {
+      const loginUrl = new URL("/login", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    const payload = await verifyEdgeToken(sessionCookie);
+    if (!payload) {
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);

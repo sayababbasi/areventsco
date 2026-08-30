@@ -63,12 +63,34 @@ export async function uploadToSupabaseStorage({
 
   // 3. If Supabase Client is configured, upload directly to Supabase Storage
   if (supabaseStorage) {
-    const { data, error } = await supabaseStorage.storage
+    let { data, error } = await supabaseStorage.storage
       .from(bucketName)
       .upload(cleanPath, buffer, {
         contentType,
         upsert: true,
       });
+
+    // If bucket does not exist, auto-create public bucket and retry
+    if (error && (error.message.includes("Bucket not found") || error.message.includes("not found"))) {
+      try {
+        await supabaseStorage.storage.createBucket(bucketName, {
+          public: true,
+          fileSizeLimit: MAX_FILE_SIZE_BYTES,
+        });
+
+        const retry = await supabaseStorage.storage
+          .from(bucketName)
+          .upload(cleanPath, buffer, {
+            contentType,
+            upsert: true,
+          });
+
+        data = retry.data;
+        error = retry.error;
+      } catch (bucketErr) {
+        console.error("Auto bucket creation failed:", bucketErr);
+      }
+    }
 
     if (error) {
       throw new Error(`Supabase Storage upload error: ${error.message}`);

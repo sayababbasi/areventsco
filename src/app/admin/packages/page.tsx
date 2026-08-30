@@ -18,6 +18,7 @@ import {
   Clock,
   Sparkles,
 } from "lucide-react";
+import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
 
 interface PackageItem {
@@ -468,6 +469,16 @@ export default function AdminPackagesPage() {
                     className="w-full px-3 py-2 bg-brand-warm-50 border border-brand-warm-200 rounded-xl text-brand-navy-950 focus:outline-none focus:border-brand-gold-500"
                   />
                 </div>
+              </div>
+
+              <div>
+                <ImageUploadDropzone
+                  value={formImage}
+                  onChange={(url) => setFormImage(url)}
+                  folder="packages"
+                  altText={formTitle || "AR Events Co Package"}
+                  label="Package Cover Image (Supabase Storage)"
+                />
               </div>
 
               <div>

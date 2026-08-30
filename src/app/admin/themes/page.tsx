@@ -17,6 +17,7 @@ import {
   RefreshCw,
   SlidersHorizontal,
 } from "lucide-react";
+import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
 
 interface ThemeItem {
@@ -480,13 +481,12 @@ export default function AdminThemesPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-brand-navy-900 mb-1">Featured Image Path / URL</label>
-                <input
-                  type="text"
-                  placeholder="/images/themes/theme_lavender_dream.jpg"
+                <ImageUploadDropzone
                   value={formHeroImage}
-                  onChange={(e) => setFormHeroImage(e.target.value)}
-                  className="w-full px-3 py-2 bg-brand-warm-50 border border-brand-warm-200 rounded-xl text-brand-navy-950 focus:outline-none focus:border-brand-gold-500 font-mono text-[11px]"
+                  onChange={(url) => setFormHeroImage(url)}
+                  folder="themes"
+                  altText={formTitle || "AR Events Co Theme"}
+                  label="Theme Cover Image (Supabase Storage)"
                 />
               </div>
 

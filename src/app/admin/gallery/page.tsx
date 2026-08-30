@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Tag,
 } from "lucide-react";
+import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 
 interface MediaAsset {
   id: string;
@@ -473,15 +474,25 @@ export default function AdminGalleryPage() {
                 />
               </div>
 
+              <div>
+                <ImageUploadDropzone
+                  value={formData.url}
+                  onChange={(url) => setFormData({ ...formData, url })}
+                  folder="gallery"
+                  altText={formData.altText || formData.title}
+                  label="Upload Photo to Supabase Storage *"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-brand-navy-900 mb-1">Image Asset URL *</label>
+                  <label className="block font-semibold text-brand-navy-900 mb-1">Image CDN URL</label>
                   <input
                     type="text"
                     required
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    placeholder="/images/hero/hero_birthday_lawn.jpg"
+                    placeholder="https://..."
                     className="w-full p-2.5 rounded-xl border border-brand-warm-300 focus:outline-none focus:border-brand-gold-500 bg-white"
                   />
                 </div>
