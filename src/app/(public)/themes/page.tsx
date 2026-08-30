@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles, CheckCircle2, ChevronRight, Eye, Calendar } from 
 import { formatPKR } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0; // Fresh database query on request
+export const revalidate = 60; // 60s ISR Cache for maximum speed
 
 export const metadata = {
   title: "Birthday Decoration Themes & 3D Backdrops Islamabad & Rawalpindi | AR Events Co.",
@@ -48,17 +48,17 @@ export default async function ThemesPage() {
   return (
     <div className="bg-brand-warm-50/40 min-h-screen">
       {/* 1. HERO HEADER */}
-      <section className="bg-gradient-to-b from-brand-navy-950 to-brand-navy-900 text-white py-16 sm:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-b from-brand-navy-950 to-brand-navy-900 text-white py-14 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#C5A880_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-brand-gold-500/10 border border-brand-gold-400/30 text-brand-gold-300 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-gold-500/15 border border-brand-gold-400/30 text-brand-gold-300 text-xs font-semibold uppercase tracking-wider shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Twin Cities Authentic Decor Portfolio</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-white tracking-tight leading-tight">
             Curated Birthday Decoration Themes
           </h1>
-          <p className="text-brand-navy-200 text-sm sm:text-base leading-relaxed">
+          <p className="text-brand-warm-100 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
             Every theme is designed and executed by our dedicated in-house styling team. Pick your preferred setup below to inspect the full inclusions, photography, and book online.
           </p>
         </div>

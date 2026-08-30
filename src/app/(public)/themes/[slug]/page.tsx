@@ -17,6 +17,8 @@ import {
 import { prisma } from "@/lib/db";
 import { formatPKR } from "@/lib/utils";
 
+export const revalidate = 60; // 60s ISR caching for high-speed page loads
+
 // Comprehensive fallback data for twin-cities decoration themes
 const STATIC_THEMES: Record<
   string,

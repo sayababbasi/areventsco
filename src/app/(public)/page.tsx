@@ -19,7 +19,7 @@ import {
 import { formatPKR } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0; // Live database query
+export const revalidate = 60; // 60s ISR caching for ultra-fast response times
 
 export default async function HomePage() {
   const dbThemes = await prisma.theme.findMany({

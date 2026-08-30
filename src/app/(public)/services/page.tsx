@@ -4,7 +4,7 @@ import { Camera, Sparkles, Utensils, Music, Cake, Smile, ArrowRight, Wrench, Cal
 import { formatPKR } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0;
+export const revalidate = 60; // 60s ISR Cache
 
 export const metadata = {
   title: "Birthday & Event Services in Islamabad & Rawalpindi | AR Events Co.",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Phone, MessageCircle, HelpCircle } from "lucide-react";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0;
+export const revalidate = 60; // 60s ISR Cache
 
 export const metadata = {
   title: "Frequently Asked Questions | AR Events Co. Islamabad & Rawalpindi",

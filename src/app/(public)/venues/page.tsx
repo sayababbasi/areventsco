@@ -4,7 +4,7 @@ import { MapPin, Users, Building, ArrowRight, Calendar } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0;
+export const revalidate = 60; // 60s ISR Cache
 
 export const metadata = {
   title: "Partner Birthday Venues Islamabad & Rawalpindi | AR Events Co.",

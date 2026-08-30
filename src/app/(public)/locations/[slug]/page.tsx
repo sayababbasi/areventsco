@@ -22,6 +22,8 @@ interface Props {
   params: { slug: string };
 }
 
+export const revalidate = 60; // 60s ISR Cache
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const location = await prisma.locationPage.findUnique({
     where: { slug: params.slug },

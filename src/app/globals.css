@@ -76,6 +76,10 @@
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200;
   }
 
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
   .gold-divider {
     @apply h-[2px] w-16 bg-gradient-to-r from-brand-gold-300 via-brand-gold-500 to-brand-gold-300 my-4;
   }

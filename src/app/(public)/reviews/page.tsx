@@ -2,7 +2,7 @@ import { Star, ShieldCheck, MessageSquareQuote } from "lucide-react";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 
-export const revalidate = 0;
+export const revalidate = 60; // 60s ISR Cache
 
 export const metadata = {
   title: "Client Reviews & Testimonials | AR Events Co. Islamabad & Rawalpindi",
