@@ -111,10 +111,9 @@ export function SafepayPaymentCard({
 
   // 3. Handle URL parameters on return/redirect
   useEffect(() => {
-    const paymentParam = searchParams.get("payment");
-    const tokenParam = searchParams.get("token");
+    const tokenParam = searchParams?.get("tracker") || searchParams?.get("token");
 
-    if (paymentParam === "success" && tokenParam) {
+    if (tokenParam) {
       verifyTracker(tokenParam);
     }
   }, [searchParams, verifyTracker]);

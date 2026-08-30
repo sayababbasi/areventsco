@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
@@ -195,15 +196,24 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
             </div>
 
             {/* 1. SECURE ONLINE PAYMENT (SAFEPAY SANDBOX) */}
-            <SafepayPaymentCard
-              bookingReference={booking.reference}
-              totalAmountMinor={booking.totalAmountMinor}
-              depositRequiredMinor={booking.depositRequiredMinor}
-              amountPaidMinor={booking.amountPaidMinor}
-              balanceDueMinor={booking.balanceDueMinor}
-              isFullyPaid={isFullyPaid}
-              isAdvancePaid={isAdvancePaid}
-            />
+            <Suspense
+              fallback={
+                <div className="card-luxury p-6 space-y-4 border-2 border-brand-gold-500/20 bg-white animate-pulse">
+                  <div className="h-5 bg-brand-warm-200 rounded w-1/3" />
+                  <div className="h-20 bg-brand-warm-100 rounded" />
+                </div>
+              }
+            >
+              <SafepayPaymentCard
+                bookingReference={booking.reference}
+                totalAmountMinor={booking.totalAmountMinor}
+                depositRequiredMinor={booking.depositRequiredMinor}
+                amountPaidMinor={booking.amountPaidMinor}
+                balanceDueMinor={booking.balanceDueMinor}
+                isFullyPaid={isFullyPaid}
+                isAdvancePaid={isAdvancePaid}
+              />
+            </Suspense>
 
             {/* 2. MANUAL BANK TRANSFER INSTRUCTIONS */}
             <div className="card-luxury p-6 space-y-4 bg-brand-gold-50/30 border-brand-gold-200">

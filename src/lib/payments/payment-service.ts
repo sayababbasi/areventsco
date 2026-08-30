@@ -135,9 +135,9 @@ export class PaymentService {
       (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
 
     const successRedirectUrl =
-      params.redirectUrl || `${baseUrl}/booking/${booking.reference}?payment=success&token=${trackerResult.token}`;
+      params.redirectUrl || `${baseUrl}/booking/${booking.reference}`;
     const cancelRedirectUrl =
-      params.cancelUrl || `${baseUrl}/booking/${booking.reference}?payment=cancelled&token=${trackerResult.token}`;
+      params.cancelUrl || `${baseUrl}/booking/${booking.reference}`;
 
     // 8. Generate hosted checkout URL
     const checkoutUrl = SafepayGateway.generateCheckoutUrl({
