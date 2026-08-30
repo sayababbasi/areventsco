@@ -23,6 +23,11 @@ async function main() {
   await prisma.section.deleteMany();
   await prisma.page.deleteMany();
   await prisma.setting.deleteMany();
+  await prisma.mediaAsset.deleteMany();
+  await prisma.inventoryItem.deleteMany();
+  await prisma.team.deleteMany();
+  await prisma.inquiry.deleteMany();
+  await prisma.expense.deleteMany();
   await prisma.customerProfile.deleteMany();
   await prisma.staffProfile.deleteMany();
   await prisma.user.deleteMany();
@@ -585,24 +590,28 @@ async function main() {
       answer: "We cover all sectors of Islamabad (F, G, E, H, I, Bani Gala, Chak Shahzad, Park View, Bahria Enclave) and all zones of Rawalpindi including Bahria Town (Phases 1-8), DHA (Phases 1-5), Cantt, Satellite Town, and surrounding locations.",
       category: "General",
       isFeatured: true,
+      sortOrder: 1,
     },
     {
       question: "How far in advance should I book my birthday celebration?",
       answer: "We recommend booking at least 1 to 2 weeks in advance to secure your preferred date and time slot. For bespoke custom themes or weekend dates, 3 weeks notice is optimal.",
       category: "Booking",
       isFeatured: true,
+      sortOrder: 2,
     },
     {
       question: "Can I customize a package with specific colors, cake, and extra decor?",
       answer: "Absolutely! Our online booking platform allows you to pick your base package, select custom themes, add extra entertainment, photography, marquee numbers, and specify bespoke color palettes.",
       category: "Customization",
       isFeatured: true,
+      sortOrder: 3,
     },
     {
       question: "What is your payment policy and deposit requirement?",
       answer: "We require an advance deposit (typically PKR 20,000 - 50,000 depending on package size) upon booking confirmation to secure the date and begin decor production. The remaining balance can be settled on the day of the event.",
       category: "Pricing",
       isFeatured: true,
+      sortOrder: 4,
     },
   ];
 
@@ -610,6 +619,105 @@ async function main() {
     await prisma.faq.create({ data: faq });
   }
   console.log("✅ Seed FAQs created successfully.");
+
+  // 9.5 CREATE GALLERY MEDIA ASSETS
+  const galleryAssetsData = [
+    {
+      title: "Ayra's 1st Birthday Garden Lawn Setup",
+      caption: "Lilac circular backdrop arch with 3D ONE marquee letters in Islamabad F-8 garden.",
+      altText: "Outdoor luxury birthday decoration setup in Islamabad with Margalla hills backdrop",
+      url: "/images/hero/hero_birthday_lawn.jpg",
+      category: "Outdoor Events",
+      tags: "Outdoor, Lawn, 1st Birthday, Lavender, Islamabad",
+      isFeatured: true,
+      sortOrder: 1,
+    },
+    {
+      title: "Lavender Dream Princess Stage",
+      caption: "Soft lilac and royal purple circular arch with organic balloon garlands and fluted plinths.",
+      altText: "Lilac and violet princess birthday backdrop setup in Islamabad",
+      url: "/images/themes/theme_lavender_dream.jpg",
+      category: "Kids Birthdays",
+      tags: "Girls, Princess, Pastel, Lavender, Stage",
+      isFeatured: true,
+      sortOrder: 2,
+    },
+    {
+      title: "Golden Sunflower Sunshine Setup",
+      caption: "Natural wood slat backdrop with neon 'Happy Birthday' and giant wooden ONE blocks.",
+      altText: "Golden sunflower rustic theme birthday decoration in Rawalpindi",
+      url: "/images/themes/theme_sunflower_sunshine.jpg",
+      category: "Themes",
+      tags: "Sunflowers, Rustic, Neon, 1st Birthday, Wooden",
+      isFeatured: true,
+      sortOrder: 3,
+    },
+    {
+      title: "Enchanted Dusty Rose Bunny Backdrop",
+      caption: "Velvet arch panels, floral meadow beds, and Peter Rabbit character props in Islamabad residence.",
+      altText: "Dusty rose storybook bunny themed birthday stage setup",
+      url: "/images/themes/theme_dusty_rose_bunny.jpg",
+      category: "Luxury Events",
+      tags: "Dusty Rose, Bunny, Floral, High-End, Velvet",
+      isFeatured: true,
+      sortOrder: 4,
+    },
+    {
+      title: "Vintage Little Racer Grand Prix",
+      caption: "Beep Beep! I'm ONE! backdrop with checkered floor runners and retro roadsters.",
+      altText: "Vintage race car themed first birthday decor setup in Bahria Town Rawalpindi",
+      url: "/images/themes/theme_vintage_racer.jpg",
+      category: "Kids Birthdays",
+      tags: "Boys, Racing, Checkered, 1st Birthday, Props",
+      isFeatured: false,
+      sortOrder: 5,
+    },
+    {
+      title: "Jungle Safari Kingdom Hoop",
+      caption: "Circular balloon hoop of sage green and gold balloons with lifelike plush safari animals.",
+      altText: "Jungle safari animal birthday party decor in DHA Islamabad",
+      url: "/images/themes/theme_jungle_safari.jpg",
+      category: "Balloon Decor",
+      tags: "Safari, Jungle, Animals, Green, Gold, Balloons",
+      isFeatured: true,
+      sortOrder: 6,
+    },
+    {
+      title: "Pastel Butterfly Wonderland",
+      caption: "Whimsical pastel pink, lilac, and gold butterfly stage with cascading balloon clouds.",
+      altText: "Pastel butterfly wonderland birthday setup in Islamabad Club",
+      url: "/images/themes/theme_butterfly_wonderland.jpg",
+      category: "Luxury Events",
+      tags: "Butterflies, Pastel, Girls, Clouds, Luxury",
+      isFeatured: false,
+      sortOrder: 7,
+    },
+    {
+      title: "Royal Midnight Prince & Gold Banquet",
+      caption: "Regal midnight navy and gold mirror finish stage with glowing crown motif and mirror plinths.",
+      altText: "Midnight navy and mirror chrome gold royal prince birthday banquet setup",
+      url: "/images/themes/theme_royal_midnight_prince.jpg",
+      category: "Luxury Events",
+      tags: "Royal, Navy, Gold, Mirror Plinths, Milestone, Banquets",
+      isFeatured: true,
+      sortOrder: 8,
+    },
+    {
+      title: "Speed Champion Two Fast",
+      caption: "Racing to Two Formula 1 inspired party setup with illuminated marquee 2 and tire plinths.",
+      altText: "Formula 1 racing champion second birthday celebration decor in Rawalpindi",
+      url: "/images/themes/theme_speed_champion.jpg",
+      category: "Kids Birthdays",
+      tags: "Racing, Red, Black, Marquee Numbers, Boys",
+      isFeatured: false,
+      sortOrder: 9,
+    },
+  ];
+
+  for (const asset of galleryAssetsData) {
+    await prisma.mediaAsset.create({ data: asset });
+  }
+  console.log("✅ Seed Media Assets created successfully.");
 
   // 10. CREATE COUPONS
   await prisma.coupon.create({
