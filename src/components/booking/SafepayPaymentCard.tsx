@@ -163,7 +163,7 @@ export function SafepayPaymentCard({
     }
   }, [modalOpen, activeTrackerToken, activePaymentType, refreshPaymentStatus]);
 
-  // 6. Initiate Payment Session (Double-Click Protected)
+  // 6. Initiate Payment Session (Direct Top-Level Secure Checkout)
   const handleInitiatePayment = async (type: "ADVANCE" | "BALANCE" | "FULL") => {
     if (loadingType || verifying) return; // Prevent double click
 
@@ -186,16 +186,12 @@ export function SafepayPaymentCard({
         throw new Error(data.error || "Unable to initialize Safepay checkout session");
       }
 
-      // Open Embedded Checkout Modal
-      setCheckoutUrl(data.checkoutUrl);
-      setActiveTrackerToken(data.token);
-      setActivePaymentType(type);
-      setActivePayableAmountMinor(data.amountMinor || (type === "ADVANCE" ? depositRequiredMinor : balanceDueMinor));
-      setModalOpen(true);
+      // Direct top-level redirection to Safepay's official checkout page
+      // This eliminates browser 3rd-party cookie & nested iframe PCI blocks on card inputs
+      window.location.href = data.checkoutUrl;
     } catch (err: any) {
       console.error("[PAYMENT-CARD] Initiation error:", err);
       setErrorMessage(err.message || "An unexpected error occurred. Please try again.");
-    } finally {
       setLoadingType(null);
     }
   };
@@ -358,6 +354,19 @@ export function SafepayPaymentCard({
           </div>
         )}
 
+        {/* Sandbox Test Card Notice */}
+        <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+            <CreditCard className="w-3.5 h-3.5 text-amber-700" />
+            <span>Safepay Sandbox Test Card Credentials:</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 text-[11px] font-mono text-amber-950 bg-white/70 p-2 rounded-lg border border-amber-200">
+            <div><span className="text-amber-700 font-sans font-semibold">Card:</span> 4242 4242 4242 4242</div>
+            <div><span className="text-amber-700 font-sans font-semibold">Expiry:</span> 12/28</div>
+            <div><span className="text-amber-700 font-sans font-semibold">CVV:</span> 123</div>
+          </div>
+        </div>
+
         {/* Footer Security Badges */}
         <div className="pt-2 border-t border-brand-warm-200 flex flex-wrap items-center justify-between gap-2 text-[10px] text-brand-navy-400">
           <div className="flex items-center gap-1.5">
@@ -365,96 +374,11 @@ export function SafepayPaymentCard({
             <span>Visa, MasterCard, UnionPay, PayPak</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>PCI-DSS Level 1 Encrypted</span>
+            <Lock className="w-3 h-3 text-emerald-600" />
+            <span>PCI-DSS Level 1 256-Bit SSL Encrypted</span>
           </div>
         </div>
       </div>
-
-      {/* ========================================================================= */}
-      {/* EMBEDDED SAFEPAY CHECKOUT MODAL OVERLAY */}
-      {/* ========================================================================= */}
-      {modalOpen && checkoutUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-brand-navy-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-brand-gold-400/30 overflow-hidden flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
-            <div className="bg-brand-navy-950 text-white px-5 py-4 flex items-center justify-between border-b border-brand-gold-500/20">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-brand-gold-500/20 text-brand-gold-400 flex items-center justify-center font-serif font-bold text-sm">
-                  AR
-                </div>
-                <div>
-                  <h4 className="text-sm font-serif font-bold text-white flex items-center gap-2">
-                    AR Events Co. Checkout
-                    <span className="text-[10px] font-sans px-2 py-0.5 rounded bg-brand-gold-500/20 text-brand-gold-300 font-bold">
-                      Safepay Sandbox
-                    </span>
-                  </h4>
-                  <p className="text-[11px] text-brand-warm-200">
-                    Booking: {bookingReference} • Amount: {formatPKR(activePayableAmountMinor)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <a
-                  href={checkoutUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-brand-gold-300 hover:text-brand-gold-200 hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white/5 border border-white/10"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Open in New Tab</span>
-                </a>
-
-                <button
-                  onClick={() => {
-                    if (confirm("Are you sure you want to close the checkout? If you haven't completed payment, your booking will remain pending.")) {
-                      setModalOpen(false);
-                      if (activeTrackerToken) {
-                        verifyTracker(activeTrackerToken);
-                      }
-                    }
-                  }}
-                  className="p-1.5 rounded-lg text-brand-warm-300 hover:text-white hover:bg-white/10 transition"
-                  title="Close checkout"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Embedded Iframe */}
-            <div className="relative flex-1 min-h-[500px] sm:min-h-[560px] bg-brand-warm-50">
-              <iframe
-                ref={iframeRef}
-                src={checkoutUrl}
-                title="Safepay Embedded Checkout"
-                className="w-full h-full border-0 absolute inset-0"
-                allow="payment"
-              />
-            </div>
-
-            {/* Modal Footer */}
-            <div className="bg-brand-warm-50 border-t border-brand-warm-200 px-5 py-3 flex items-center justify-between text-xs text-brand-navy-600">
-              <div className="flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-[11px]">256-Bit SSL Encrypted by Safepay</span>
-              </div>
-              <button
-                onClick={() => {
-                  if (activeTrackerToken) {
-                    verifyTracker(activeTrackerToken);
-                  }
-                }}
-                className="text-[11px] font-bold text-brand-gold-700 hover:text-brand-gold-800 flex items-center gap-1"
-              >
-                <RefreshCw className="w-3 h-3" />
-                <span>I have completed payment</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
