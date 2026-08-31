@@ -489,17 +489,29 @@ export class InvoiceService {
             theme: true,
             venue: true,
             customer: true,
+            payments: {
+              where: { status: { in: ["VERIFIED", "PAID"] } },
+              orderBy: { createdAt: "asc" },
+            },
           },
         },
         items: true,
         payments: {
           where: { status: { in: ["VERIFIED", "PAID"] } },
-          orderBy: { paidAt: "desc" },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
 
     if (!invoice) throw new Error("Invoice not found");
+
+    // Merge payments from invoice and booking to guarantee full ledger representation
+    const paymentsMap = new Map<string, any>();
+    invoice.payments.forEach((p) => paymentsMap.set(p.id, p));
+    invoice.booking.payments.forEach((p) => paymentsMap.set(p.id, p));
+    const allConfirmedPayments = Array.from(paymentsMap.values()).sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
     // Fetch Global Business Settings
     const settings = await prisma.setting.findMany();
@@ -550,11 +562,11 @@ export class InvoiceService {
         depositRequiredMinor: invoice.depositRequiredMinor,
         currency: invoice.currency,
       },
-      payments: invoice.payments.map((p) => ({
+      payments: allConfirmedPayments.map((p) => ({
         paymentMethod: p.paymentMethod,
         amountMinor: p.amountMinor,
         status: p.status,
-        providerRef: p.providerRef,
+        providerRef: p.providerRef ? String(p.providerRef) : "Direct Gateway Transfer",
         paidAt: p.paidAt,
         createdAt: p.createdAt,
       })),

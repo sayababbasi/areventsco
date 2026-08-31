@@ -30,22 +30,26 @@ export interface PaymentSessionResult {
 }
 
 export interface SafepayTrackerData {
-  id?: number;
+  id?: number | string;
   token: string;
-  client: string;
-  amount: number;
+  client?: string;
+  amount: number | string;
   currency: string;
-  environment: string;
-  state: string; // TRACKER_STARTED, TRACKER_ENDED, PAID, etc.
+  environment?: string;
+  state: string; // TRACKER_STARTED, TRACKER_ENDED, PAID, COMPLETED, FAILED, CANCELLED
   state_reason?: string;
   order_id?: string;
   transaction?: {
-    id?: string;
+    id?: string | number;
+    token?: string;
     status?: string;
-    amount?: number;
+    amount?: number | string;
+    currency?: string;
+    reference?: string | number;
   } | null;
   created_at?: string;
   updated_at?: string;
+  [key: string]: any;
 }
 
 export interface WebhookProcessingResult {
@@ -58,3 +62,4 @@ export interface WebhookProcessingResult {
   message?: string;
   error?: string;
 }
+

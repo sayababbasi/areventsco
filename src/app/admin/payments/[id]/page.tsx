@@ -31,7 +31,11 @@ export default function AdminPaymentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
+  const [verifyResult, setVerifyResult] = useState<{
+    success: boolean;
+    status: string;
+    message: string;
+  } | null>(null);
 
   const fetchPaymentDetail = async () => {
     try {
@@ -60,19 +64,31 @@ export default function AdminPaymentDetailPage() {
   const handleVerifyGateway = async () => {
     try {
       setIsVerifying(true);
-      setVerifyMessage(null);
+      setVerifyResult(null);
       const res = await fetch(`/api/admin/payments/${paymentId}/verify`, {
         method: "POST",
       });
       const json = await res.json();
       if (json.success) {
-        setVerifyMessage(`Gateway Status: ${json.status}. Records updated successfully!`);
-        fetchPaymentDetail();
+        setVerifyResult({
+          success: true,
+          status: json.status,
+          message: json.message || `Safepay confirmed status: ${json.status}. Database ledger synchronized.`,
+        });
+        await fetchPaymentDetail();
       } else {
-        setVerifyMessage(`Verification response: ${json.error || json.status}`);
+        setVerifyResult({
+          success: false,
+          status: json.status || "FAILED",
+          message: json.message || json.error || "Could not verify payment status with gateway.",
+        });
       }
     } catch (err: any) {
-      setVerifyMessage(`Verification failed: ${err.message}`);
+      setVerifyResult({
+        success: false,
+        status: "NETWORK_ERROR",
+        message: err.message || "Network error connecting to verification endpoint.",
+      });
     } finally {
       setIsVerifying(false);
     }
@@ -171,10 +187,29 @@ export default function AdminPaymentDetailPage() {
         </div>
       </div>
 
-      {verifyMessage && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-center gap-2">
-          <RefreshCw className="w-4 h-4 text-blue-600 flex-shrink-0" />
-          <span>{verifyMessage}</span>
+      {verifyResult && (
+        <div
+          className={`p-4 rounded-xl text-xs flex items-start gap-2.5 border ${
+            verifyResult.success && verifyResult.status === "PAID"
+              ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+              : verifyResult.success
+              ? "bg-blue-50 border-blue-300 text-blue-900"
+              : "bg-amber-50 border-amber-300 text-amber-900"
+          }`}
+        >
+          {verifyResult.success && verifyResult.status === "PAID" ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          )}
+          <div className="space-y-0.5">
+            <span className="font-bold block">
+              {verifyResult.success && verifyResult.status === "PAID"
+                ? "Gateway Verification Confirmed"
+                : `Gateway Status: ${verifyResult.status}`}
+            </span>
+            <p className="leading-relaxed">{verifyResult.message}</p>
+          </div>
         </div>
       )}
 
