@@ -1,6 +1,6 @@
 import { Star, ShieldCheck, MessageSquareQuote } from "lucide-react";
 import Link from "next/link";
-import { prisma } from "@/lib/db";
+import { getSafeReviews } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache
 
@@ -10,10 +10,7 @@ export const metadata = {
 };
 
 export default async function ReviewsPage() {
-  const reviews = await prisma.review.findMany({
-    where: { isActive: true },
-    orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const reviews = await getSafeReviews();
 
   return (
     <div className="py-12 sm:py-16 space-y-16 bg-brand-warm-50/40 min-h-screen">

@@ -15,6 +15,13 @@ export default function ErrorBoundary({
     console.error("Application error boundary triggered:", error);
   }, [error]);
 
+  const isNetworkError =
+    error?.message?.toLowerCase().includes("fetch") ||
+    error?.message?.toLowerCase().includes("network") ||
+    error?.message?.toLowerCase().includes("database") ||
+    error?.message?.toLowerCase().includes("enotfound") ||
+    error?.message?.toLowerCase().includes("reach database");
+
   return (
     <div className="min-h-screen bg-brand-navy-950 text-white flex items-center justify-center p-6 relative overflow-hidden">
       <div className="relative max-w-md w-full text-center space-y-6 animate-fade-in">
@@ -24,13 +31,15 @@ export default function ErrorBoundary({
 
         <div className="space-y-2">
           <span className="text-xs font-mono text-rose-400 uppercase tracking-widest">
-            Application Exception
+            {isNetworkError ? "Connection Notice" : "Application Exception"}
           </span>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
-            Something went wrong
+            {isNetworkError ? "Network Connection Required" : "Something went wrong"}
           </h1>
           <p className="text-xs text-brand-warm-300 leading-relaxed">
-            An unexpected error occurred while loading this page. Our technical team has been notified.
+            {isNetworkError
+              ? "Unable to reach remote cloud services. Please check your internet connection or click below to reload."
+              : "An unexpected error occurred while loading this page. Our technical team has been notified."}
           </p>
         </div>
 
@@ -40,7 +49,7 @@ export default function ErrorBoundary({
             className="btn-gold w-full sm:w-auto text-xs px-5 py-2.5 flex items-center justify-center space-x-2 font-bold shadow-lg"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>Try Again</span>
+            <span>Try Again / Reload</span>
           </button>
           <Link
             href="/"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Users, Clock, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
-import { prisma } from "@/lib/db";
+import { getSafePackages } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache for maximum speed
 
@@ -12,12 +12,9 @@ export const metadata = {
 };
 
 export default async function PackagesPage() {
-  const dbPackages = await prisma.package.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const dbPackages = await getSafePackages();
 
-  const packages = dbPackages.map((pkg) => {
+  const packages = dbPackages.map((pkg: any) => {
     let features: string[] = [];
     try {
       features = JSON.parse(pkg.features || "[]");

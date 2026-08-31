@@ -17,18 +17,14 @@ import {
   Eye,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
-import { prisma } from "@/lib/db";
+import { getSafeThemes, getSafePackages, getSafeReviews, getSafeFaqs } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR caching for ultra-fast response times
 
 export default async function HomePage() {
-  const dbThemes = await prisma.theme.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    take: 6,
-  });
+  const dbThemes = await getSafeThemes(6);
 
-  const featuredThemes = dbThemes.map((t) => {
+  const featuredThemes = dbThemes.map((t: any) => {
     let colors: string[] = [];
     try {
       colors = JSON.parse(t.colorPalette || "[]");
@@ -46,13 +42,9 @@ export default async function HomePage() {
     };
   });
 
-  const dbPackages = await prisma.package.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    take: 3,
-  });
+  const dbPackages = await getSafePackages(3);
 
-  const packages = dbPackages.map((p) => {
+  const packages = dbPackages.map((p: any) => {
     let feats: string[] = [];
     try {
       feats = JSON.parse(p.features || "[]");
@@ -73,13 +65,9 @@ export default async function HomePage() {
     };
   });
 
-  const dbReviews = await prisma.review.findMany({
-    where: { isActive: true },
-    orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
-    take: 3,
-  });
+  const dbReviews = await getSafeReviews(3);
 
-  const testimonials = dbReviews.map((r) => ({
+  const testimonials = dbReviews.map((r: any) => ({
     name: r.authorName,
     location: r.authorLocation,
     event: r.eventTitle,
@@ -87,12 +75,9 @@ export default async function HomePage() {
     rating: r.rating,
   }));
 
-  const dbFaqs = await prisma.faq.findMany({
-    where: { isActive: true, isFeatured: true },
-    take: 4,
-  });
+  const dbFaqs = await getSafeFaqs(4, true);
 
-  const faqs = dbFaqs.map((f) => ({
+  const faqs = dbFaqs.map((f: any) => ({
     q: f.question,
     a: f.answer,
   }));

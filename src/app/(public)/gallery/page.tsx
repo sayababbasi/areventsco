@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Calendar, MapPin, ImageIcon } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { getSafeGallery } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache
 
@@ -11,10 +11,7 @@ export const metadata = {
 };
 
 export default async function GalleryPage() {
-  const dbAssets = await prisma.mediaAsset.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const dbAssets = await getSafeGallery();
 
   return (
     <div className="py-12 sm:py-16 space-y-16 bg-brand-warm-50/40 min-h-screen">

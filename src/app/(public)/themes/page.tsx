@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles, CheckCircle2, ChevronRight, Eye, Calendar } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
-import { prisma } from "@/lib/db";
+import { getSafeThemes } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache for maximum speed
 
@@ -12,12 +12,9 @@ export const metadata = {
 };
 
 export default async function ThemesPage() {
-  const dbThemes = await prisma.theme.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const dbThemes = await getSafeThemes();
 
-  const themes = dbThemes.map((t) => {
+  const themes = dbThemes.map((t: any) => {
     let colors: string[] = [];
     try {
       colors = JSON.parse(t.colorPalette || "[]");

@@ -18,6 +18,8 @@ import {
   Star,
 } from "lucide-react";
 
+import { getSafePackages, getSafeThemes, getSafeVenues, getSafeFaqs } from "@/lib/data-fallback";
+
 interface Props {
   params: { slug: string };
 }
@@ -25,13 +27,18 @@ interface Props {
 export const revalidate = 60; // 60s ISR Cache
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const location = await prisma.locationPage.findUnique({
-    where: { slug: params.slug },
-  });
+  let location: any = null;
+  try {
+    location = await prisma.locationPage.findUnique({
+      where: { slug: params.slug },
+    });
+  } catch {
+    // Offline fallback
+  }
 
   if (!location) {
     return {
-      title: "Location Not Found | AR Events Co.",
+      title: `${params.slug.replace(/-/g, " ")} Birthday Decoration | AR Events Co.`,
     };
   }
 
@@ -56,39 +63,52 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LocationLandingPage({ params }: Props) {
-  const location = await prisma.locationPage.findUnique({
-    where: { slug: params.slug, isActive: true },
-  });
-
-  if (!location) {
-    notFound();
+  let location: any = null;
+  try {
+    location = await prisma.locationPage.findUnique({
+      where: { slug: params.slug, isActive: true },
+    });
+  } catch {
+    // Offline fallback
   }
 
-  // Fetch local packages, themes, venues, and FAQs
+  if (!location) {
+    // Generate fallback location object from slug
+    const formattedName = params.slug
+      .split("-")
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(" ");
+    const isRwp = params.slug.toLowerCase().includes("rawalpindi") || params.slug.toLowerCase().includes("bahria");
+
+    location = {
+      name: formattedName,
+      slug: params.slug,
+      city: isRwp ? "Rawalpindi" : "Islamabad",
+      headline: `Luxury Birthday Decoration & Event Planning in ${formattedName}`,
+      description: `AR Events Co. brings bespoke birthday decorations, themed 3D backdrops, organic balloon arches, and complete party planning directly to your home, lawn, or banquet in ${formattedName}.`,
+      deliveryTimeHours: 3,
+      startingPriceMinor: 3500000,
+      heroImage: "/images/hero/hero_birthday_lawn.jpg",
+      popularVenues: JSON.stringify(["Home Lounge / Private Lawn", "Islamabad Club", "Margalla Terrace"]),
+      faqs: JSON.stringify([
+        {
+          question: `Do you deliver birthday setups to ${formattedName}?`,
+          answer: `Yes! Our styling team and decor logistics crew provide full on-site delivery, setup, and teardown across ${formattedName}.`,
+        },
+        {
+          question: "How long does setup take?",
+          answer: "Most setups take between 2.5 to 3.5 hours on-site prior to your event start time.",
+        },
+      ]),
+    };
+  }
+
+  // Fetch local packages, themes, venues, and FAQs safely
   const [packages, themes, venues, faqs] = await Promise.all([
-    prisma.package.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-      take: 3,
-    }),
-    prisma.theme.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-      take: 4,
-    }),
-    prisma.venue.findMany({
-      where: {
-        isActive: true,
-        ...(location.city === "Rawalpindi"
-          ? { city: "Rawalpindi" }
-          : { city: "Islamabad" }),
-      },
-      take: 3,
-    }),
-    prisma.faq.findMany({
-      where: { isActive: true },
-      take: 5,
-    }),
+    getSafePackages(3),
+    getSafeThemes(4),
+    getSafeVenues(3),
+    getSafeFaqs(5),
   ]);
 
   let coverageList: string[] = [];

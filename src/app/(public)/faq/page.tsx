@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Phone, MessageCircle, HelpCircle } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { getSafeFaqs } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache
 
@@ -10,10 +10,7 @@ export const metadata = {
 };
 
 export default async function FaqPage() {
-  const dbFaqs = await prisma.faq.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const dbFaqs = await getSafeFaqs();
 
   // Group by category
   const categoriesMap: Record<string, { q: string; a: string }[]> = {};

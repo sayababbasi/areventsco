@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Users, Building, ArrowRight, Calendar } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
-import { prisma } from "@/lib/db";
+import { getSafeVenues } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache
 
@@ -12,10 +12,7 @@ export const metadata = {
 };
 
 export default async function VenuesPage() {
-  const dbVenues = await prisma.venue.findMany({
-    where: { isActive: true },
-    orderBy: [{ createdAt: "desc" }],
-  });
+  const dbVenues = await getSafeVenues();
 
   return (
     <div className="py-12 sm:py-16 space-y-16 bg-brand-warm-50/40 min-h-screen">

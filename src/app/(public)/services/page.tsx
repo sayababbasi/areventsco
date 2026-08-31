@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Camera, Sparkles, Utensils, Music, Cake, Smile, ArrowRight, Wrench, Calendar, CheckCircle2 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
-import { prisma } from "@/lib/db";
+import { getSafeServices } from "@/lib/data-fallback";
 
 export const revalidate = 60; // 60s ISR Cache
 
@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 const getCategoryIcon = (cat: string) => {
-  const c = cat.toLowerCase();
+  const c = (cat || "").toLowerCase();
   if (c.includes("photo") || c.includes("video")) return Camera;
   if (c.includes("cake") || c.includes("bakery")) return Cake;
   if (c.includes("magic") || c.includes("entertainment") || c.includes("show")) return Smile;
@@ -22,10 +22,7 @@ const getCategoryIcon = (cat: string) => {
 };
 
 export default async function ServicesPage() {
-  const dbServices = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
+  const dbServices = await getSafeServices();
 
   return (
     <div className="py-12 sm:py-16 space-y-16 bg-brand-warm-50/40 min-h-screen">

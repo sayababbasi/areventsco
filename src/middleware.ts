@@ -102,26 +102,29 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // 4. Dynamic 301/302 Database Redirects Check
-  try {
-    const origin = req.nextUrl.origin;
-    const res = await fetch(
-      `${origin}/api/redirects?path=${encodeURIComponent(pathname)}`,
-      {
-        headers: { "x-middleware-check": "1" },
-        next: { revalidate: 300 }, // 5 min cache
-      }
-    );
+  // 4. Dynamic 301/302 Database Redirects Check (Fast non-blocking with 400ms timeout)
+  if (!pathname.startsWith("/api/")) {
+    try {
+      const origin = req.nextUrl.origin;
+      const res = await fetch(
+        `${origin}/api/redirects?path=${encodeURIComponent(pathname)}`,
+        {
+          headers: { "x-middleware-check": "1" },
+          signal: AbortSignal.timeout(400),
+          next: { revalidate: 300 }, // 5 min cache
+        }
+      );
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data.redirect && data.redirect.toPath) {
-        const targetUrl = new URL(data.redirect.toPath, req.url);
-        return NextResponse.redirect(targetUrl, data.redirect.statusCode || 301);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.redirect && data.redirect.toPath) {
+          const targetUrl = new URL(data.redirect.toPath, req.url);
+          return NextResponse.redirect(targetUrl, data.redirect.statusCode || 301);
+        }
       }
+    } catch {
+      // Fail gracefully if check times out or network is offline
     }
-  } catch (err) {
-    // Fail gracefully if check times out
   }
 
   return NextResponse.next();

@@ -305,7 +305,12 @@ const STATIC_THEMES: Record<
 };
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+  let dbTheme: any = null;
+  try {
+    dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+  } catch {
+    // Fall back safely to static themes when offline
+  }
   const theme = dbTheme
     ? {
         title: dbTheme.seoTitle || `${dbTheme.title} Birthday Theme in Islamabad & Rawalpindi | AR Events Co.`,
@@ -348,7 +353,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ThemeDetailPage({ params }: { params: { slug: string } }) {
-  const dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+  let dbTheme: any = null;
+  try {
+    dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+  } catch {
+    // Fall back safely to static themes when offline
+  }
 
   let theme: any = null;
 

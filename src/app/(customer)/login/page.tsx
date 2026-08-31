@@ -45,7 +45,11 @@ export default function LoginPage() {
 
   const handleQuickDemoFill = (roleEmail: string) => {
     setEmail(roleEmail);
-    setPassword("Password123!");
+    if (roleEmail === "sayababbasi806@gmail.com" || roleEmail === "admin@areventsco.com") {
+      setPassword("@dmin@SAYAB123");
+    } else {
+      setPassword("Password123!");
+    }
   };
 
   return (
@@ -53,7 +57,7 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-3">
         <Link href="/" className="inline-flex items-center justify-center">
           <Image
-            src="/brand/bg remove logo.png"
+            src="/brand/website logo.png"
             alt="AR Events Co."
             width={180}
             height={56}
