@@ -106,9 +106,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="p-6 border-b border-brand-navy-800 bg-brand-navy-950/60 sticky top-0 z-10 backdrop-blur-md">
             <Link href="/" className="inline-flex items-center">
               <Image
-                src="/brand/bg remove logo.png"
+                src="/brand/website logo no bg.png"
                 alt="AR Events Co."
-                width={170}
+                width={180}
                 height={50}
                 className="h-10 w-auto object-contain brightness-110"
               />

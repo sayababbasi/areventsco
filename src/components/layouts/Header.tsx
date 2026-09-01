@@ -57,10 +57,10 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative flex items-center h-14 w-auto transition-transform duration-300 group-hover:scale-105">
               <Image
-                src="/brand/bg remove logo.png"
+                src="/brand/website logo no bg.png"
                 alt="AR Events Co. Logo"
-                width={200}
-                height={56}
+                width={220}
+                height={60}
                 className="h-12 sm:h-14 w-auto object-contain"
                 priority
               />

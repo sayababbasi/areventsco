@@ -57,10 +57,10 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-3">
         <Link href="/" className="inline-flex items-center justify-center">
           <Image
-            src="/brand/website logo.png"
+            src="/brand/website logo no bg.png"
             alt="AR Events Co."
-            width={180}
-            height={56}
+            width={200}
+            height={60}
             className="h-14 w-auto object-contain"
           />
         </Link>
