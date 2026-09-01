@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
 import { format } from "date-fns";
+import { useRealtime } from "@/client/hooks/useRealtime";
 
 interface InvoiceItem {
   id: string;
@@ -161,6 +162,39 @@ export default function AdminInvoicesPage() {
       setLoading(false);
     }
   };
+
+  // Real-time Event Subscription for instant invoice synchronization
+  useRealtime({
+    channels: "admin",
+    onEvent: (evt) => {
+      if (
+        evt.type === "INVOICE_UPDATED" ||
+        evt.type === "PAYMENT_COMPLETED" ||
+        evt.type === "BOOKING_CREATED" ||
+        evt.type === "BOOKING_STATUS_UPDATED"
+      ) {
+        // Silently update invoice list without full page loading spinner
+        const queryParams = new URLSearchParams();
+        if (statusFilter !== "ALL") queryParams.set("status", statusFilter);
+        if (cityFilter !== "ALL") queryParams.set("city", cityFilter);
+        if (search.trim()) queryParams.set("search", search.trim());
+        if (sortBy) queryParams.set("sortBy", sortBy);
+        if (dateFrom) queryParams.set("dateFrom", dateFrom);
+        if (dateTo) queryParams.set("dateTo", dateTo);
+        queryParams.set("page", pagination.page.toString());
+        queryParams.set("limit", "15");
+
+        fetch(`/api/admin/invoices?${queryParams.toString()}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.invoices) setInvoices(data.invoices);
+            if (data.stats) setStats(data.stats);
+            if (data.pagination) setPagination(data.pagination);
+          })
+          .catch((err) => console.error("[REALTIME-INVOICES] Silent refresh error:", err));
+      }
+    },
+  });
 
   useEffect(() => {
     fetchInvoices(1);

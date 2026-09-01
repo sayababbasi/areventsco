@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { SafepayPaymentCard } from "@/components/booking/SafepayPaymentCard";
+import { RealtimeBookingLiveHeader } from "@/components/booking/RealtimeBookingLiveHeader";
 
 interface BookingDetailPageProps {
   params: {
@@ -148,7 +149,15 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
             </span>
           </div>
 
-          <div>{getStatusBadge(booking.status)}</div>
+          <div className="w-full">
+            <RealtimeBookingLiveHeader
+              reference={booking.reference}
+              initialStatus={booking.status}
+              initialAmountPaidMinor={booking.amountPaidMinor}
+              initialBalanceDueMinor={booking.balanceDueMinor}
+              totalAmountMinor={booking.totalAmountMinor}
+            />
+          </div>
         </div>
 
         {/* Two-Column Grid: Details & Invoicing */}

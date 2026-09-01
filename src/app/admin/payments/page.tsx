@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
 import { format } from "date-fns";
+import { useRealtime } from "@/client/hooks/useRealtime";
 
 interface PaymentRecord {
   id: string;
@@ -104,6 +105,35 @@ export default function AdminPaymentsPage() {
       setIsLoading(false);
     }
   };
+
+  // Real-time Event Subscription for instant payments synchronization
+  useRealtime({
+    channels: "admin",
+    onEvent: (evt) => {
+      if (
+        evt.type === "PAYMENT_COMPLETED" ||
+        evt.type === "PAYMENT_INITIATED" ||
+        evt.type === "INVOICE_UPDATED" ||
+        evt.type === "BOOKING_STATUS_UPDATED"
+      ) {
+        // Silently refresh payment list without full page loading spinner
+        const params = new URLSearchParams();
+        if (searchQuery) params.append("q", searchQuery);
+        if (statusFilter !== "ALL") params.append("status", statusFilter);
+        if (gatewayFilter !== "ALL") params.append("provider", gatewayFilter);
+
+        fetch(`/api/admin/payments?${params.toString()}`)
+          .then((res) => res.json())
+          .then((json) => {
+            if (json.success) {
+              setPayments(json.data.payments || []);
+              setStats(json.data.stats || null);
+            }
+          })
+          .catch((err) => console.error("[REALTIME-PAYMENTS] Silent refresh error:", err));
+      }
+    },
+  });
 
   useEffect(() => {
     fetchPayments();

@@ -7,6 +7,7 @@ import {
   WebhookProcessingResult,
 } from "./types";
 import { toSafepayAmount } from "./currency";
+import { eventBus } from "@/lib/realtime/event-bus";
 
 /**
  * Normalizes any external gateway field into a clean string or null.
@@ -740,6 +741,60 @@ export class PaymentService {
       bookingId: payment.bookingId,
       transactionId: cleanTxId,
     });
+
+    try {
+      const refreshed = await prisma.booking.findUnique({
+        where: { id: payment.bookingId },
+        include: { invoices: true },
+      });
+
+      if (refreshed) {
+        eventBus.broadcast(
+          "PAYMENT_COMPLETED",
+          `booking:${refreshed.reference}`,
+          {
+            paymentId: payment.id,
+            bookingId: refreshed.id,
+            bookingReference: refreshed.reference,
+            amountPaidMinor: refreshed.amountPaidMinor,
+            balanceDueMinor: refreshed.balanceDueMinor,
+            status: refreshed.status,
+            transactionId: cleanTxId,
+          },
+          true
+        );
+
+        eventBus.broadcast(
+          "BOOKING_STATUS_UPDATED",
+          `booking:${refreshed.reference}`,
+          {
+            bookingId: refreshed.id,
+            reference: refreshed.reference,
+            status: refreshed.status,
+            amountPaidMinor: refreshed.amountPaidMinor,
+            balanceDueMinor: refreshed.balanceDueMinor,
+          },
+          true
+        );
+
+        if (refreshed.invoices?.[0]) {
+          eventBus.broadcast(
+            "INVOICE_UPDATED",
+            `booking:${refreshed.reference}`,
+            {
+              invoiceId: refreshed.invoices[0].id,
+              invoiceNumber: refreshed.invoices[0].invoiceNumber,
+              status: refreshed.invoices[0].status,
+              amountPaidMinor: refreshed.invoices[0].amountPaidMinor,
+              balanceDueMinor: refreshed.invoices[0].balanceDueMinor,
+            },
+            true
+          );
+        }
+      }
+    } catch (broadcastErr) {
+      console.error("[PAYMENT-SERVICE] Error broadcasting realtime event:", broadcastErr);
+    }
   }
 
   /**

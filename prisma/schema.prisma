@@ -270,6 +270,10 @@ model Booking {
   payments        Payment[]
   invoices        Invoice[]
   notifications   Notification[]
+
+  @@index([status])
+  @@index([customerId])
+  @@index([createdAt])
 }
 
 model BookingItem {
@@ -333,6 +337,8 @@ model Payment {
   @@index([bookingId])
   @@index([invoiceId])
   @@index([providerToken])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Invoice {
@@ -373,6 +379,7 @@ model Invoice {
   @@index([bookingId])
   @@index([status])
   @@index([customerEmail])
+  @@index([createdAt])
 }
 
 model InvoiceItem {

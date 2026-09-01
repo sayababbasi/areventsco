@@ -14,6 +14,7 @@ import {
   ExternalLink,
   ChevronDown,
 } from "lucide-react";
+import { useRealtime } from "@/client/hooks/useRealtime";
 
 interface BookingRecord {
   id: string;
@@ -89,7 +90,54 @@ export default function AdminBookingsPage() {
     setFilteredBookings(result);
   }, [searchTerm, statusFilter, bookings]);
 
+  // Real-time Event Subscription
+  useRealtime({
+    channels: "admin",
+    onEvent: (evt) => {
+      if (evt.type === "BOOKING_CREATED" && evt.data) {
+        setBookings((prev) => {
+          if (prev.some((b) => b.id === evt.data.id || b.reference === evt.data.reference)) {
+            return prev;
+          }
+          return [evt.data as BookingRecord, ...prev];
+        });
+      } else if (
+        (evt.type === "BOOKING_STATUS_UPDATED" || evt.type === "PAYMENT_COMPLETED") &&
+        evt.data
+      ) {
+        setBookings((prev) =>
+          prev.map((b) => {
+            if (b.id === evt.data.bookingId || b.reference === evt.data.reference || b.reference === evt.data.bookingReference) {
+              return {
+                ...b,
+                status: evt.data.status || b.status,
+                amountPaidMinor:
+                  typeof evt.data.amountPaidMinor === "number"
+                    ? evt.data.amountPaidMinor
+                    : b.amountPaidMinor,
+                balanceDueMinor:
+                  typeof evt.data.balanceDueMinor === "number"
+                    ? evt.data.balanceDueMinor
+                    : b.balanceDueMinor,
+              };
+            }
+            return b;
+          })
+        );
+      }
+    },
+  });
+
   const handleStatusUpdate = async (id: string, newStatus: string) => {
+    // 1. Save previous status for optimistic rollback
+    const previousBooking = bookings.find((b) => b.id === id);
+    const previousStatus = previousBooking?.status;
+
+    // 2. Optimistic instant UI update
+    setBookings((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
+    );
+
     setUpdatingId(id);
     try {
       const res = await fetch(`/api/admin/bookings/${id}/status`, {
@@ -98,13 +146,23 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (res.ok) {
-        setBookings((prev) =>
-          prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
-        );
+      if (!res.ok) {
+        // Rollback on server rejection
+        if (previousStatus) {
+          setBookings((prev) =>
+            prev.map((b) => (b.id === id ? { ...b, status: previousStatus } : b))
+          );
+        }
+        alert("Failed to update status on server. Rolled back.");
       }
     } catch (err) {
       console.error(err);
+      if (previousStatus) {
+        setBookings((prev) =>
+          prev.map((b) => (b.id === id ? { ...b, status: previousStatus } : b))
+        );
+      }
+      alert("Network error updating status. Rolled back.");
     } finally {
       setUpdatingId(null);
     }

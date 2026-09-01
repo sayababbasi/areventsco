@@ -13,6 +13,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
+import { toSafepayAmount } from "@/lib/payments/currency";
+import { useRealtime } from "@/client/hooks/useRealtime";
 
 interface SafepayPaymentCardProps {
   bookingReference: string;
@@ -76,7 +78,27 @@ export function SafepayPaymentCard({
     return null;
   }, [bookingReference]);
 
-  // 2. Active Verification with Safepay Gateway
+  // 2. Real-time Event Subscription for instant status synchronization
+  useRealtime({
+    channels: `booking:${bookingReference}`,
+    onEvent: (evt) => {
+      if (evt.type === "PAYMENT_COMPLETED" || evt.type === "BOOKING_STATUS_UPDATED") {
+        setVerifying(false);
+        setVerificationPendingNotice(null);
+        setRecentPaymentSuccess(true);
+        if (typeof evt.data.amountPaidMinor === "number") {
+          setAmountPaidMinor(evt.data.amountPaidMinor);
+        }
+        if (typeof evt.data.balanceDueMinor === "number") {
+          setBalanceDueMinor(evt.data.balanceDueMinor);
+          setIsFullyPaid(evt.data.balanceDueMinor === 0);
+        }
+        refreshPaymentStatus();
+      }
+    },
+  });
+
+  // 3. Active Verification with Safepay Gateway
   const verifyTracker = useCallback(
     async (token: string) => {
       setVerifying(true);
@@ -92,44 +114,20 @@ export function SafepayPaymentCard({
         if (data.success && (data.status === "PAID" || data.status === "TRACKER_ENDED")) {
           setRecentPaymentSuccess(true);
           await refreshPaymentStatus();
-          router.refresh();
         } else if (data.status === "FAILED") {
           setErrorMessage(data.error || "Payment was declined or cancelled. Please try again.");
         } else {
-          // Status is PENDING / PROCESSING - Start controlled polling
           setVerificationPendingNotice(
-            "Your transaction is currently being processed by your bank and Safepay. Your payment will not be charged again."
+            "Your transaction is currently being processed by your bank and Safepay. Your payment will update automatically."
           );
-
-          pollCountRef.current = 0;
-          if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-
-          pollTimerRef.current = setInterval(async () => {
-            pollCountRef.current += 1;
-            const live = await refreshPaymentStatus();
-
-            if (live?.isFullyPaid || (live?.amountPaidMinor && live.amountPaidMinor > initialPaid)) {
-              setRecentPaymentSuccess(true);
-              setVerificationPendingNotice(null);
-              if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-              router.refresh();
-            } else if (pollCountRef.current >= 6) {
-              // 6 attempts * 2.5s = 15s timeout
-              if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-              setVerificationPendingNotice(
-                "Payment verification is taking a moment to finalize. Your booking status will update automatically once confirmed by the bank."
-              );
-            }
-          }, 2500);
         }
       } catch (err: any) {
         console.error("[PAYMENT-CARD] Tracker verification error:", err);
-        setErrorMessage("Payment verification is temporarily checking gateway status. Please refresh in a moment.");
       } finally {
         setVerifying(false);
       }
     },
-    [initialPaid, refreshPaymentStatus, router]
+    [refreshPaymentStatus]
   );
 
   // 3. Handle URL parameters on return/redirect from Safepay
