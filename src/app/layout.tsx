@@ -4,6 +4,7 @@ import "./globals.css";
 import { LocalBusinessJsonLd } from "@/components/seo/JsonLd";
 import { ModalProvider } from "@/components/ui/ModalProvider";
 import { NavigationProgress } from "@/components/ui/NavigationProgress";
+import { FloatingActionsMenu } from "@/components/ui/FloatingActionsMenu";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://areventsco.com"),
@@ -80,7 +81,10 @@ export default function RootLayout({
           <NavigationProgress />
         </Suspense>
         <LocalBusinessJsonLd />
-        <ModalProvider>{children}</ModalProvider>
+        <ModalProvider>
+          {children}
+          <FloatingActionsMenu />
+        </ModalProvider>
       </body>
     </html>
   );
