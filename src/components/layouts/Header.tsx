@@ -59,7 +59,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative flex items-center h-14 w-auto transition-transform duration-300 group-hover:scale-105">
               <Image
-                src="/brand/arevebts logo.png"
+                src="/brand/arevents logo.png"
                 alt="AR Events Co. Logo"
                 width={220}
                 height={60}
