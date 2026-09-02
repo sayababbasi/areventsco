@@ -118,7 +118,7 @@ export function generateInvoicePdf(data: InvoicePdfData): jsPDF {
     currentY + 9
   );
   doc.text(
-    `Phone: ${data.businessSettings?.phone || "+92 300 8555123"} | Email: ${data.businessSettings?.email || "info@areventsco.com"}`,
+    `Phone: ${data.businessSettings?.phone || "+92 316 0513841"} | Email: ${data.businessSettings?.email || "info@areventsco.com"}`,
     margin,
     currentY + 13.5
   );
@@ -315,7 +315,7 @@ export function generateInvoicePdf(data: InvoicePdfData): jsPDF {
   doc.text(`Account Number: ${data.businessSettings?.accountNumber || "02010108932014"}`, margin + 4, currentY + 22);
   doc.text(`IBAN: ${data.businessSettings?.iban || "PK89MEZN0002010108932014"}`, margin + 4, currentY + 27);
   doc.text(
-    "Please send screenshot/proof of deposit via WhatsApp to +92 300 8555123",
+    "Please send screenshot/proof of deposit via WhatsApp to +92 316 0513841",
     margin + 4,
     currentY + 33
   );
@@ -468,7 +468,7 @@ export function generateInvoicePdf(data: InvoicePdfData): jsPDF {
   doc.setFontSize(7);
   doc.setTextColor(darkSlate[0], darkSlate[1], darkSlate[2]);
   doc.text(
-    `AR Events Co. • ${data.businessSettings?.website || "areventsco.com"} • ${data.businessSettings?.phone || "+92 300 8555123"} • Page 1 of 1`,
+    `AR Events Co. • ${data.businessSettings?.website || "areventsco.com"} • ${data.businessSettings?.phone || "+92 316 0513841"} • Page 1 of 1`,
     pageWidth / 2,
     footerY + 4.5,
     { align: "center" }

@@ -177,7 +177,7 @@ export default async function CustomerDashboardPage() {
                     </Link>
 
                     <a
-                      href={`https://wa.me/923008555123?text=Hi%20AR%20Events%20Co,%20inquiring%20about%20booking%20${b.reference}`}
+                      href={`https://wa.me/923160513841?text=Hi%20AR%20Events%20Co,%20inquiring%20about%20booking%20${b.reference}`}
                       target="_blank"
                       rel="noreferrer"
                       className="btn-outline-navy px-4 py-2 text-xs font-semibold"

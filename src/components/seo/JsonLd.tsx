@@ -18,7 +18,7 @@ export function LocalBusinessJsonLd({
     url: APP_BASE_URL,
     logo: `${APP_BASE_URL}/brand/website logo no bg.png`,
     image: `${APP_BASE_URL}/images/hero/hero_birthday_lawn.jpg`,
-    telephone: "+923008555123",
+    telephone: "+923160513841",
     email: "info@areventsco.com",
     priceRange: "PKR 45,000 - 250,000",
     currenciesAccepted: "PKR",

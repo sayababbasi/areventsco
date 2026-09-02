@@ -299,7 +299,7 @@ export default function AdminInvoiceDetailPage() {
                 Islamabad & Rawalpindi's Premier Birthday & Event Planners
               </p>
               <div className="text-xs text-brand-navy-500 mt-1">
-                Phone: +92 300 8555123 • Email: info@areventsco.com • Web: areventsco.com
+                Phone: +92 316 0513841 • Email: info@areventsco.com • Web: areventsco.com
               </div>
             </div>
 

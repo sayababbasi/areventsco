@@ -44,7 +44,7 @@ export function Footer() {
                 <Facebook className="w-4 h-4" />
               </a>
               <a
-                href="https://wa.me/923008555123"
+                href="https://wa.me/923160513841"
                 target="_blank"
                 rel="noreferrer"
                 className="p-2.5 rounded-full bg-brand-navy-900 text-brand-gold-400 hover:bg-emerald-600 hover:text-white transition-all"
@@ -124,8 +124,8 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="w-4 h-4 text-brand-gold-400 flex-shrink-0" />
-                <a href="tel:+923008555123" className="hover:text-brand-gold-400 transition-colors">
-                  +92 300 8555123
+                <a href="https://wa.me/923160513841" target="_blank" rel="noopener noreferrer" className="hover:text-brand-gold-400 transition-colors">
+                  +92 316 0513841
                 </a>
               </div>
               <div className="flex items-center space-x-3">
@@ -144,7 +144,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-brand-navy-400">
-          <p>© {new Date().getFullYear()} AR Events Co. (areventsco.com). All rights reserved.</p>
+          <p>© {new Date().getFullYear()} <Link style={{ color: "#e0d6e8ff" }} href="/">AR Events Co.</Link> All rights reserved  | Devloped by <Link style={{ color: "#e0d6e8ff" }} href="https://revoticai.com" target="_blank" rel="noopener noreferrer">Revotic AI Pvt Ltd</Link></p>
           <div className="flex items-center space-x-6 mt-4 sm:mt-0">
             <Link href="/faq" className="hover:text-brand-gold-400 transition-colors">FAQ</Link>
             <Link href="/contact" className="hover:text-brand-gold-400 transition-colors">Contact</Link>

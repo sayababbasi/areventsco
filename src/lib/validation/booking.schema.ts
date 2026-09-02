@@ -15,7 +15,7 @@ export const bookingCreateSchema = z.object({
   // Customer details
   name: z.string().min(2, "Full name is required"),
   email: z.string().email("Valid email address is required"),
-  phone: z.string().min(10, "Valid Pakistani phone number required (e.g. 0300 1234567)"),
+  phone: z.string().min(10, "Valid Pakistani phone number required (e.g. 0316 0513841)"),
   address: z.string().min(5, "Address or venue location is required"),
   
   // Event details

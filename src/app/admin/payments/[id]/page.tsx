@@ -357,7 +357,7 @@ export default function AdminPaymentDetailPage() {
               <div>
                 <span className="text-brand-navy-500 block">Phone Number</span>
                 <p className="font-mono text-brand-navy-900 mt-0.5">
-                  {booking?.customerPhone || booking?.customer?.user?.phone || "+92 300 8555123"}
+                  {booking?.customerPhone || booking?.customer?.user?.phone || "+92 316 0513841"}
                 </p>
               </div>
 

@@ -126,7 +126,7 @@ export class PaymentService {
 
       const customerName = booking.customer?.user?.name || "Valued Client";
       const customerEmail = booking.customer?.user?.email || "customer@areventsco.com";
-      const customerPhone = booking.customer?.user?.phone || "+92 300 8555123";
+      const customerPhone = booking.customer?.user?.phone || "+92 316 0513841";
 
       invoice = await prisma.invoice.create({
         data: {

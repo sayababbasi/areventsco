@@ -75,7 +75,7 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
   const accountTitle = settingsMap["bank_account_title"] || "AR Events Co.";
   const accountNumber = settingsMap["bank_account_number"] || "02010108932014";
   const iban = settingsMap["bank_iban"] || "PK89MEZN0002010108932014";
-  const supportPhone = settingsMap["support_phone"] || "+92 300 8555123";
+  const supportPhone = settingsMap["support_phone"] || "+92 316 0513841";
 
   const getStatusBadge = (status: string) => {
     switch (status) {

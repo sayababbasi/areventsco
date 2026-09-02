@@ -169,7 +169,7 @@ export default async function LocationLandingPage({ params }: Props) {
               <span>Book Setup in {location.name}</span>
             </Link>
             <a
-              href="https://wa.me/923008555123"
+              href="https://wa.me/923160513841"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline-gold px-6 py-3.5 text-sm font-semibold flex items-center space-x-2 bg-brand-navy-900/60"
@@ -402,11 +402,13 @@ export default async function LocationLandingPage({ params }: Props) {
               Start Online Booking
             </Link>
             <a
-              href="tel:+923008555123"
+              href="https://wa.me/923160513841"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-outline-gold px-6 py-3.5 text-sm font-semibold flex items-center space-x-2"
             >
-              <Phone className="w-4 h-4" />
-              <span>Call +92 300 8555123</span>
+              <MessageCircle className="w-4 h-4 text-emerald-400" />
+              <span>WhatsApp +92 316 0513841</span>
             </a>
           </div>
         </section>

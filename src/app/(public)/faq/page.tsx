@@ -76,14 +76,14 @@ export default async function FaqPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <a
-              href="tel:+923001234567"
+              href="tel:+923160513841"
               className="btn-gold px-6 py-3 text-xs font-bold flex items-center space-x-2 w-full sm:w-auto justify-center"
             >
               <Phone className="w-4 h-4" />
-              <span>Call +92 300 1234567</span>
+              <span>Call +92 316 0513841</span>
             </a>
             <a
-              href="https://wa.me/923001234567"
+              href="https://wa.me/923160513841"
               target="_blank"
               rel="noreferrer"
               className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 transition-colors w-full sm:w-auto justify-center shadow-sm"

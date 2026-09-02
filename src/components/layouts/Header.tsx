@@ -33,11 +33,13 @@ export function Header() {
           </div>
           <div className="hidden sm:flex items-center space-x-6">
             <a
-              href="tel:+923008555123"
+              href="https://wa.me/923160513841"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center hover:text-brand-gold-300 transition-colors"
             >
               <Phone className="w-3.5 h-3.5 mr-1.5 text-brand-gold-400" />
-              +92 300 8555123
+              +92 316 0513841
             </a>
             <Link
               href="/login"

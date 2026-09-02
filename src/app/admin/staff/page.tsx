@@ -167,7 +167,7 @@ export default function AdminStaffPage() {
                         <p className="text-[10px] text-brand-navy-500">{s.department}</p>
                       </td>
                       <td className="py-3.5 px-4 text-brand-navy-700">
-                        {s.user?.phone || "+92 300 1234567"}
+                        {s.user?.phone || "+92 316 0513841"}
                       </td>
                       <td className="py-3.5 px-4 text-center font-bold text-brand-gold-700">
                         {s._count?.assignedBookings || 0}
@@ -226,7 +226,7 @@ export default function AdminStaffPage() {
                 <label className="block font-bold text-brand-navy-900 mb-1">Phone Number</label>
                 <input
                   type="text"
-                  placeholder="+92 300 1234567"
+                  placeholder="+92 316 0513841"
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   className="w-full px-3 py-2 bg-brand-warm-50 border border-brand-warm-200 rounded-xl"

@@ -87,8 +87,8 @@ export default function ContactPage() {
                   <Phone className="w-5 h-5 text-brand-gold-600 mt-1 flex-shrink-0" />
                   <div>
                     <strong className="block text-brand-navy-900">Direct Phone Line</strong>
-                    <a href="tel:+923001234567" className="hover:text-brand-gold-600 text-base font-semibold">
-                      +92 300 1234567
+                    <a href="tel:+923160513841" className="hover:text-brand-gold-600 text-base font-semibold">
+                      +92 316 0513841
                     </a>
                   </div>
                 </div>
@@ -98,12 +98,12 @@ export default function ContactPage() {
                   <div>
                     <strong className="block text-brand-navy-900">Instant WhatsApp Support</strong>
                     <a
-                      href="https://wa.me/923001234567"
+                      href="https://wa.me/923160513841"
                       target="_blank"
                       rel="noreferrer"
                       className="text-emerald-700 font-semibold hover:underline"
                     >
-                      +92 300 1234567 (Click to Chat)
+                      +92 316 0513841 (Click to Chat)
                     </a>
                   </div>
                 </div>
@@ -187,7 +187,7 @@ export default function ContactPage() {
                       <input
                         type="tel"
                         required
-                        placeholder="0300 1234567"
+                        placeholder="0316 0513841"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         className="w-full px-4 py-2.5 text-xs rounded-xl border border-brand-warm-300 focus:outline-none focus:ring-2 focus:ring-brand-gold-400 bg-brand-warm-50/50"

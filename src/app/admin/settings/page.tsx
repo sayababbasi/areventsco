@@ -23,8 +23,8 @@ export default function AdminSettingsPage() {
   // Form Fields
   const [companyName, setCompanyName] = useState("AR Events Co.");
   const [tagline, setTagline] = useState("YOUR CELEBRATION, OUR PASSION");
-  const [phone, setPhone] = useState("+92 300 1234567");
-  const [whatsapp, setWhatsapp] = useState("+92 300 1234567");
+  const [phone, setPhone] = useState("+92 316 0513841");
+  const [whatsapp, setWhatsapp] = useState("+92 316 0513841");
   const [email, setEmail] = useState("sayababbasi0@gmail.com");
   const [address, setAddress] = useState("Main Boulevard, Sector F-7 / Bahria Town Phase 7, Islamabad & Rawalpindi");
   const [serviceAreas, setServiceAreas] = useState("Islamabad (All Sectors) & Rawalpindi (Bahria Town, DHA, Cantt)");

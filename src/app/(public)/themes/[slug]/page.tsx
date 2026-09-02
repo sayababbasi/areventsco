@@ -559,7 +559,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
                 </Link>
 
                 <a
-                  href={`https://wa.me/923001234567?text=Hi%20AR%20Events%20Co.,%20I%20am%20interested%20in%20booking%20the%20${encodeURIComponent(
+                  href={`https://wa.me/923160513841?text=Hi%20AR%20Events%20Co.,%20I%20am%20interested%20in%20booking%20the%20${encodeURIComponent(
                     theme.title
                   )}%20birthday%20theme%20in%20Islamabad/Rawalpindi.`}
                   target="_blank"

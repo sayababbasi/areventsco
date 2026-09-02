@@ -576,7 +576,7 @@ export class InvoiceService {
       businessSettings: {
         name: settingsMap["business_name"] || "AR Events Co.",
         tagline: settingsMap["business_tagline"] || "Islamabad & Rawalpindi's Premier Birthday & Event Planners",
-        phone: settingsMap["support_phone"] || "+92 300 8555123",
+        phone: settingsMap["support_phone"] || "+92 316 0513841",
         email: settingsMap["support_email"] || "info@areventsco.com",
         website: settingsMap["site_url"] || "https://areventsco.com",
         address: settingsMap["business_address"] || "Islamabad & Rawalpindi, Pakistan",

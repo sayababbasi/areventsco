@@ -99,7 +99,7 @@ export async function GET(
         accountTitle: settingsMap["bank_account_title"] || "AR Events Co.",
         accountNumber: settingsMap["bank_account_number"] || "02010108932014",
         iban: settingsMap["bank_iban"] || "PK89MEZN0002010108932014",
-        phone: settingsMap["support_phone"] || "+92 300 8555123",
+        phone: settingsMap["support_phone"] || "+92 316 0513841",
       },
     });
   } catch (error: any) {

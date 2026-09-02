@@ -760,7 +760,7 @@ export default function CustomersPage() {
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+92 300 1234567"
+                    placeholder="+92 316 0513841"
                     className="w-full p-2.5 rounded-xl border border-brand-warm-300 focus:outline-none focus:border-brand-gold-500 bg-white"
                   />
                 </div>
