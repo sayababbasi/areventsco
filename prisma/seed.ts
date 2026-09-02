@@ -36,7 +36,8 @@ async function main() {
   await prisma.user.deleteMany();
 
   // 2. CREATE SEED USERS
-  const defaultPassword = await bcrypt.hash("Password123!", 10);
+  const rawSeedPassword = process.env.SEED_DEFAULT_PASSWORD || process.env.INITIAL_ADMIN_PASSWORD || "Password123!";
+  const defaultPassword = await bcrypt.hash(rawSeedPassword, 10);
 
   // Super Admin
   const superAdmin = await prisma.user.create({
