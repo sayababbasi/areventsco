@@ -57,9 +57,28 @@ export async function POST(req: Request) {
   }
 }
 
+import { getAuthSession } from "@/lib/auth";
+
 export async function GET() {
   try {
+    const session = await getAuthSession();
+    
+    if (!session) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    const isAdmin = ["ADMIN", "SUPER_ADMIN", "STAFF", "EVENT_MANAGER"].includes(session.role);
+
+    const where = isAdmin ? {} : {
+      customer: {
+        user: {
+          email: session.email
+        }
+      }
+    };
+
     const bookings = await prisma.booking.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       take: 50,
       include: {

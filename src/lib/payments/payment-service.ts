@@ -117,6 +117,22 @@ export class PaymentService {
       };
     }
 
+    // NEW: Double Booking Prevention
+    // Before sending to gateway, verify the date is still available,
+    // to prevent concurrent checkouts bypassing the max event limit.
+    const { AvailabilityService } = await import("@/server/services/availability.service");
+    const availability = await AvailabilityService.checkAvailability(
+      booking.eventDate,
+      booking.startTime,
+      booking.city
+    );
+    if (!availability.isAvailable) {
+      return {
+        success: false,
+        error: `Checkout prevented to avoid double-booking. ${availability.reason}`,
+      };
+    }
+
     // 3. Ensure an Invoice exists for this booking
     let invoice = booking.invoices[0] || null;
     if (!invoice) {

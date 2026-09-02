@@ -22,7 +22,7 @@ export async function GET(
     // 1. Admin or Staff
     // 2. Authenticated Customer matching customerEmail
     // 3. Direct booking access with matching booking reference or ID
-    const isAdmin = session?.role === "ADMIN" || session?.role === "STAFF";
+    const isAdmin = session?.role === "ADMIN" || session?.role === "STAFF" || session?.role === "SUPER_ADMIN" || session?.role === "EVENT_MANAGER";
     const isCustomerOwner =
       session?.email &&
       (session.email.toLowerCase() === invoice.customerEmail.toLowerCase() ||

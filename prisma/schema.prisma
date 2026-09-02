@@ -325,7 +325,7 @@ model Payment {
   
   provider        String           @default("manual") // "safepay" | "manual" | "mock"
   providerRef     String?          // External Transaction ID or Bank Reference
-  providerToken   String?          // Safepay Tracker Token (track_xxx)
+  providerToken   String?          @unique // Safepay Tracker Token (track_xxx)
   failureReason   String?
   metadata        String?          // JSON metadata for webhook / transaction logs
   receiptImage    String?          // Bank transfer slip URL

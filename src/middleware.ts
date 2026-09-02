@@ -62,11 +62,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Protect Admin routes (/admin/*)
-  if (pathname.startsWith("/admin")) {
+  // 2. Protect Admin routes (/admin/* and /api/admin/*)
+  const isAdminRoute = pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
+  const isDashboardRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/api/dashboard");
+  const isApiRoute = pathname.startsWith("/api/");
+
+  if (isAdminRoute) {
     const sessionCookie = req.cookies.get("ar_session")?.value;
 
     if (!sessionCookie) {
+      if (isApiRoute) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
@@ -74,6 +79,7 @@ export async function middleware(req: NextRequest) {
 
     const payload = await verifyEdgeToken(sessionCookie);
     if (!payload) {
+      if (isApiRoute) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
@@ -81,14 +87,16 @@ export async function middleware(req: NextRequest) {
 
     const allowedRoles = ["ADMIN", "SUPER_ADMIN", "EVENT_MANAGER", "STAFF"];
     if (!payload.role || !allowedRoles.includes(payload.role)) {
+      if (isApiRoute) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
-  // 3. Protect Customer Dashboard routes (/dashboard/*)
-  if (pathname.startsWith("/dashboard")) {
+  // 3. Protect Customer Dashboard routes (/dashboard/* and /api/dashboard/*)
+  if (isDashboardRoute && !isAdminRoute) {
     const sessionCookie = req.cookies.get("ar_session")?.value;
     if (!sessionCookie) {
+      if (isApiRoute) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
@@ -96,6 +104,7 @@ export async function middleware(req: NextRequest) {
 
     const payload = await verifyEdgeToken(sessionCookie);
     if (!payload) {
+      if (isApiRoute) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
