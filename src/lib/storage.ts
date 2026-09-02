@@ -58,6 +58,23 @@ export async function uploadToSupabaseStorage({
     );
   }
 
+  // Security: If SVG is uploaded, inspect for malicious embedded JavaScript / XSS payloads
+  if (contentType === "image/svg+xml") {
+    const content = buffer.toString("utf-8").toLowerCase();
+    if (
+      content.includes("<script") ||
+      content.includes("javascript:") ||
+      content.includes("onerror=") ||
+      content.includes("onload=") ||
+      content.includes("onclick=") ||
+      content.includes("<iframe") ||
+      content.includes("<embed") ||
+      content.includes("<object")
+    ) {
+      throw new Error("Malicious SVG detected: executable scripts and event handlers are prohibited.");
+    }
+  }
+
   // 2. Sanitize Path
   const cleanPath = path.replace(/^\/+/, "").replace(/[^a-zA-Z0-9_\-\.\/]/g, "_");
 

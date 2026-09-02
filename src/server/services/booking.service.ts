@@ -93,6 +93,34 @@ export class BookingService {
     const invoiceNumber = generateInvoiceNumber(invoiceCount + 1);
 
     const booking = await prisma.$transaction(async (tx: any) => {
+      // Re-verify availability inside the transaction to prevent concurrent race conditions
+      const startOfDay = new Date(eventDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(eventDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const blockedSlot = await tx.availabilitySlot.findFirst({
+        where: {
+          date: { gte: startOfDay, lte: endOfDay },
+          isBlocked: true,
+        },
+      });
+      if (blockedSlot) {
+        throw new Error(blockedSlot.blockReason || "This date has been marked unavailable by our operations team.");
+      }
+
+      const activeBookingsCount = await tx.booking.count({
+        where: {
+          eventDate: { gte: startOfDay, lte: endOfDay },
+          status: { in: ["PENDING", "QUOTED", "CONFIRMED", "PREPARING", "INQUIRY", "AWAITING_PAYMENT"] },
+        },
+      });
+
+      const MAX_CONCURRENT_DAILY_EVENTS = 4;
+      if (activeBookingsCount >= MAX_CONCURRENT_DAILY_EVENTS) {
+        throw new Error("We have reached our maximum event capacity for this date. Please select an alternate date.");
+      }
+
       // Create Booking record
       const createdBooking = await tx.booking.create({
         data: {

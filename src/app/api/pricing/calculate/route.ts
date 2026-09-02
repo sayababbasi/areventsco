@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import { priceCalculationSchema } from "@/lib/validation/booking.schema";
 import { PricingService } from "@/server/services/pricing.service";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting: max 30 price calculations per minute per IP
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = await rateLimit(`pricing_${ip}`, 30, 60 * 1000);
+    if (!rl.success) {
+      return NextResponse.json(
+        { success: false, error: { code: "RATE_LIMIT_EXCEEDED", message: "Rate limit exceeded. Please slow down." } },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const validated = priceCalculationSchema.parse(body);
 

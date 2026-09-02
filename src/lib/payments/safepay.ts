@@ -5,9 +5,13 @@ import { SafepayTrackerData } from "./types";
 import { toSafepayAmount } from "./currency";
 
 const SAFEPAY_ENVIRONMENT = (process.env.SAFEPAY_ENVIRONMENT || "sandbox").toLowerCase() as any;
-const SAFEPAY_API_KEY = process.env.SAFEPAY_API_KEY || "sec_8f267889-2ac1-401b-99b1-e5f002f695af";
-const SAFEPAY_SECRET_KEY = process.env.SAFEPAY_SECRET_KEY || "fb0f4a6c5517e05c37b1901ff05b95982051efdd2a197e411516baf40c47acff";
+const SAFEPAY_API_KEY = process.env.SAFEPAY_API_KEY || "";
+const SAFEPAY_SECRET_KEY = process.env.SAFEPAY_SECRET_KEY || "";
 const SAFEPAY_WEBHOOK_SECRET = process.env.SAFEPAY_WEBHOOK_SECRET || SAFEPAY_SECRET_KEY;
+
+if (!SAFEPAY_API_KEY || !SAFEPAY_SECRET_KEY) {
+  console.warn("[SAFEPAY] WARNING: SAFEPAY_API_KEY or SAFEPAY_SECRET_KEY not configured. Payment operations will fail.");
+}
 
 const BASE_API_URL =
   SAFEPAY_ENVIRONMENT === "production"

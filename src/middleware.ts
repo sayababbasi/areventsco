@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const AUTH_SECRET = process.env.AUTH_SECRET || "dev-super-secret-key-areventsco-secure-12345";
+const AUTH_SECRET = process.env.AUTH_SECRET || "";
 
 async function verifyEdgeToken(token: string) {
   try {

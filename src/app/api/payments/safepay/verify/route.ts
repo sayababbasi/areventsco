@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PaymentService } from "@/lib/payments/payment-service";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    // Rate limiting: max 20 verifications per 5 minutes per IP
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = await rateLimit(`payment_verify_${ip}`, 20, 5 * 60 * 1000);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many verification requests. Please wait." },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
 

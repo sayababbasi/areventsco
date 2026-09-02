@@ -2,7 +2,11 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
 const SALT_ROUNDS = 10;
-const AUTH_SECRET = process.env.AUTH_SECRET || "dev-super-secret-key-areventsco-secure-12345";
+const AUTH_SECRET = process.env.AUTH_SECRET || "";
+
+if (!AUTH_SECRET) {
+  console.warn("[AUTH] WARNING: AUTH_SECRET not configured. Session tokens will be insecure.");
+}
 
 /**
  * Hashes a plaintext password securely using bcrypt

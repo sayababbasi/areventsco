@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSessionToken } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting: max 3 registration attempts per 30 minutes per IP
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = await rateLimit(`register_${ip}`, 3, 30 * 60 * 1000);
+    if (!rl.success) {
+      return NextResponse.json(
+        { success: false, error: { code: "RATE_LIMIT_EXCEEDED", message: "Too many registration attempts. Try again later." } },
+        { status: 429 }
+      );
+    }
+
     const { name, email, phone, password, city, address } = await req.json();
 
     if (!name || !email || !password) {

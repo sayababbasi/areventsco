@@ -49,7 +49,7 @@ export class AvailabilityService {
           lte: endOfDay,
         },
         status: {
-          in: ["PENDING", "QUOTED", "CONFIRMED", "PREPARING"],
+          in: ["PENDING", "QUOTED", "CONFIRMED", "PREPARING", "INQUIRY", "AWAITING_PAYMENT"],
         },
       },
     });
