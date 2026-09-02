@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 64" width="100" height="64">
+  <rect width="100" height="64" rx="8" fill="#FFFFFF"/>
+  <!-- Red banner -->
+  <path d="M12 12 H36 C42 12 46 16 46 22 V42 C46 48 42 52 36 52 H12 V12 Z" fill="#D81E06"/>
+  <!-- Blue banner -->
+  <path d="M36 12 H60 C66 12 70 16 70 22 V42 C70 48 66 52 60 52 H36 V12 Z" fill="#004A99"/>
+  <!-- Green banner -->
+  <path d="M60 12 H84 C88 12 90 16 90 22 V42 C90 48 88 52 84 52 H60 V12 Z" fill="#007E3A"/>
+  <!-- Stylized UnionPay / 银联 characters in white -->
+  <text x="51" y="38" fill="#FFFFFF" font-size="16" font-weight="bold" font-family="'Segoe UI', Roboto, Arial, sans-serif" text-anchor="middle" font-style="italic">UPI</text>
+</svg>

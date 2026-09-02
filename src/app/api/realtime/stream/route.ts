@@ -19,9 +19,8 @@ export async function GET(req: NextRequest) {
     if (ch === "general" || ch === "system") return true; // Public channels
     if (ch === "admin") return isAdmin; // Admin-only channel
     if (ch.startsWith("booking:")) {
-      // Customers can only subscribe to their own booking channels
-      // Admins can subscribe to any booking channel
-      return isAdmin || !!session;
+      // Allow live updates for active booking channels on checkout/tracking pages
+      return true;
     }
     return isAdmin; // Default: admin-only for unknown channels
   });

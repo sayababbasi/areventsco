@@ -39,3 +39,9 @@ next-env.d.ts
 *.db-journal
 *.sqlite
 *.sqlite3
+
+# Documentation & Scratch (kept local, excluded from public repo)
+/docs/
+/scratch/
+scripts/test-safepay-sandbox-checkout.ts
+

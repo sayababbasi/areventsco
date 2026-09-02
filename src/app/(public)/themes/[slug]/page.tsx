@@ -308,10 +308,11 @@ const STATIC_THEMES: Record<
   },
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   let dbTheme: any = null;
   try {
-    dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+    dbTheme = await prisma.theme.findUnique({ where: { slug } });
   } catch {
     // Fall back safely to static themes when offline
   }
@@ -325,13 +326,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         noIndex: dbTheme.noIndex,
         noFollow: dbTheme.noFollow,
       }
-    : STATIC_THEMES[params.slug]
+    : STATIC_THEMES[slug]
     ? {
-        title: `${STATIC_THEMES[params.slug].title} Birthday Theme in Islamabad & Rawalpindi | AR Events Co.`,
-        description: STATIC_THEMES[params.slug].description,
-        focusKeyword: `${STATIC_THEMES[params.slug].title} theme Islamabad`,
-        canonicalUrl: `/themes/${STATIC_THEMES[params.slug].slug}`,
-        ogImage: STATIC_THEMES[params.slug].heroImage,
+        title: `${STATIC_THEMES[slug].title} Birthday Theme in Islamabad & Rawalpindi | AR Events Co.`,
+        description: STATIC_THEMES[slug].description,
+        focusKeyword: `${STATIC_THEMES[slug].title} theme Islamabad`,
+        canonicalUrl: `/themes/${STATIC_THEMES[slug].slug}`,
+        ogImage: STATIC_THEMES[slug].heroImage,
         noIndex: false,
         noFollow: false,
       }
@@ -356,10 +357,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   });
 }
 
-export default async function ThemeDetailPage({ params }: { params: { slug: string } }) {
+export default async function ThemeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   let dbTheme: any = null;
   try {
-    dbTheme = await prisma.theme.findUnique({ where: { slug: params.slug } });
+    dbTheme = await prisma.theme.findUnique({ where: { slug } });
   } catch {
     // Fall back safely to static themes when offline
   }
@@ -411,7 +413,7 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
       idealFor: ["Luxury Birthday Parties", "1st Birthday Milestone Celebrations", "Twin Cities Home Lounges & Lawns"],
     };
   } else {
-    theme = STATIC_THEMES[params.slug];
+    theme = STATIC_THEMES[slug];
   }
 
   if (!theme) {

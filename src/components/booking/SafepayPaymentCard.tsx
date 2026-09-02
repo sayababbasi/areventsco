@@ -15,6 +15,7 @@ import {
 import { formatPKR } from "@/lib/utils";
 import { toSafepayAmount } from "@/lib/payments/currency";
 import { useRealtime } from "@/client/hooks/useRealtime";
+import { AcceptedPaymentBadges } from "@/components/ui/PaymentCardLogos";
 
 interface SafepayPaymentCardProps {
   bookingReference: string;
@@ -350,11 +351,8 @@ export function SafepayPaymentCard({
       )}
 
       {/* Footer Security Badges */}
-      <div className="pt-2 border-t border-brand-warm-200 flex flex-wrap items-center justify-between gap-2 text-[10px] text-brand-navy-400">
-        <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-brand-navy-600">Accepted:</span>
-          <span>Visa, MasterCard, UnionPay, PayPak</span>
-        </div>
+      <div className="pt-2.5 border-t border-brand-warm-200 flex flex-wrap items-center justify-between gap-2.5 text-[10px] text-brand-navy-400">
+        <AcceptedPaymentBadges />
         <div className="flex items-center gap-1">
           <Lock className="w-3 h-3 text-emerald-600" />
           <span>PCI-DSS Level 1 256-Bit SSL Encrypted</span>

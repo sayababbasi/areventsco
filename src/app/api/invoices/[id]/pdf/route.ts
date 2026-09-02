@@ -5,15 +5,16 @@ import { getAuthSession } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
 
     // Fetch invoice to check ownership
-    const invoice = await InvoiceService.getInvoiceById(params.id);
+    const invoice = await InvoiceService.getInvoiceById(id);
     if (!invoice) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
@@ -39,7 +40,7 @@ export async function GET(
     }
 
     // Build PDF
-    const pdfData = await InvoiceService.getInvoicePdfPayload(params.id);
+    const pdfData = await InvoiceService.getInvoicePdfPayload(id);
     const doc = generateInvoicePdf(pdfData);
     const pdfArrayBuffer = doc.output("arraybuffer");
 

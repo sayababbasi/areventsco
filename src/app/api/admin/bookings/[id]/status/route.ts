@@ -7,9 +7,10 @@ export const runtime = "nodejs";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { status, notes } = await req.json();
 
     if (!status) {
@@ -20,7 +21,7 @@ export async function PATCH(
     }
 
     const updated = await BookingService.updateStatus(
-      params.id,
+      id,
       status as BookingStatus,
       undefined,
       notes

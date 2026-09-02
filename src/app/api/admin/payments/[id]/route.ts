@@ -7,16 +7,17 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
     const payment = await prisma.payment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         booking: {
           include: {

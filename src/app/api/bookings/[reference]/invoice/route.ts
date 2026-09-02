@@ -4,11 +4,12 @@ import { getAuthSession } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { reference: string } }
+  { params }: { params: Promise<{ reference: string }> }
 ) {
   try {
+    const { reference } = await params;
     const booking = await prisma.booking.findUnique({
-      where: { reference: params.reference },
+      where: { reference },
       include: {
         customer: {
           include: { user: true },

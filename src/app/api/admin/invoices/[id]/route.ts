@@ -4,15 +4,16 @@ import { getAuthSession } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     if (!session || (session.role !== "ADMIN" && session.role !== "STAFF")) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const invoice = await InvoiceService.getInvoiceById(params.id, {
+    const invoice = await InvoiceService.getInvoiceById(id, {
       role: session.role,
       email: session.email,
     });
@@ -33,9 +34,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     if (!session || (session.role !== "ADMIN" && session.role !== "STAFF")) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
@@ -43,7 +45,7 @@ export async function PATCH(
 
     const body = await req.json();
     const updated = await InvoiceService.updateInvoice(
-      params.id,
+      id,
       body,
       session.name || session.email || "Admin"
     );

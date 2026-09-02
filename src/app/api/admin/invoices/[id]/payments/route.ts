@@ -4,9 +4,10 @@ import { getAuthSession } from "@/lib/auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     if (!session || (session.role !== "ADMIN" && session.role !== "STAFF")) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
@@ -21,7 +22,7 @@ export async function POST(
     }
 
     const updatedInvoice = await InvoiceService.recordPayment(
-      params.id,
+      id,
       {
         amountMinor: Number(body.amountMinor),
         paymentMethod: body.paymentMethod || "BANK_TRANSFER",

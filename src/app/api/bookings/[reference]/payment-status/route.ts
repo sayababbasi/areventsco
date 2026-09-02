@@ -5,10 +5,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { reference: string } }
+  { params }: { params: Promise<{ reference: string }> }
 ) {
   try {
-    const { reference } = params;
+    const { reference } = await params;
 
     if (!reference) {
       return NextResponse.json({ error: "Booking reference is required" }, { status: 400 });

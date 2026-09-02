@@ -23,16 +23,17 @@ import { SafepayPaymentCard } from "@/components/booking/SafepayPaymentCard";
 import { RealtimeBookingLiveHeader } from "@/components/booking/RealtimeBookingLiveHeader";
 
 interface BookingDetailPageProps {
-  params: {
+  params: Promise<{
     reference: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function BookingDetailPage({ params }: BookingDetailPageProps) {
+  const { reference } = await params;
   const booking = await prisma.booking.findUnique({
-    where: { reference: params.reference },
+    where: { reference },
     include: {
       customer: {
         include: { user: true },

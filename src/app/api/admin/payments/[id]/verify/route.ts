@@ -7,16 +7,17 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getAuthSession();
     if (!session || (session.role !== "ADMIN" && session.role !== "SUPER_ADMIN")) {
       return NextResponse.json({ error: "Unauthorized access. Admin privilege required." }, { status: 401 });
     }
 
     const payment = await prisma.payment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         booking: {
           include: { invoices: true },
@@ -51,7 +52,7 @@ export async function POST(
 
     // Refetch the updated payment with fresh booking and invoice relations
     const updatedPayment = await prisma.payment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         booking: {
           include: { invoices: true },

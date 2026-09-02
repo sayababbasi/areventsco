@@ -21,16 +21,17 @@ import {
 import { getSafePackages, getSafeThemes, getSafeVenues, getSafeFaqs } from "@/lib/data-fallback";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const revalidate = 60; // 60s ISR Cache
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   let location: any = null;
   try {
     location = await prisma.locationPage.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
   } catch {
     // Offline fallback
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!location) {
     return {
-      title: `${params.slug.replace(/-/g, " ")} Birthday Decoration | AR Events Co.`,
+      title: `${slug.replace(/-/g, " ")} Birthday Decoration | AR Events Co.`,
     };
   }
 
@@ -63,10 +64,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LocationLandingPage({ params }: Props) {
+  const { slug } = await params;
   let location: any = null;
   try {
     location = await prisma.locationPage.findUnique({
-      where: { slug: params.slug, isActive: true },
+      where: { slug, isActive: true },
     });
   } catch {
     // Offline fallback
@@ -74,15 +76,15 @@ export default async function LocationLandingPage({ params }: Props) {
 
   if (!location) {
     // Generate fallback location object from slug
-    const formattedName = params.slug
+    const formattedName = slug
       .split("-")
       .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
       .join(" ");
-    const isRwp = params.slug.toLowerCase().includes("rawalpindi") || params.slug.toLowerCase().includes("bahria");
+    const isRwp = slug.toLowerCase().includes("rawalpindi") || slug.toLowerCase().includes("bahria");
 
     location = {
       name: formattedName,
-      slug: params.slug,
+      slug,
       city: isRwp ? "Rawalpindi" : "Islamabad",
       headline: `Luxury Birthday Decoration & Event Planning in ${formattedName}`,
       description: `AR Events Co. brings bespoke birthday decorations, themed 3D backdrops, organic balloon arches, and complete party planning directly to your home, lawn, or banquet in ${formattedName}.`,
