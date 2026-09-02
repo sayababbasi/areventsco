@@ -11,7 +11,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="relative flex items-center h-16 w-auto">
               <Image
-                src="/brand/website logo no bg.png"
+                src="/brand/website logo.png"
                 alt="AR Events Co. Logo"
                 width={220}
                 height={64}

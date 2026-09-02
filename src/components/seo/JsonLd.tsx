@@ -16,7 +16,7 @@ export function LocalBusinessJsonLd({
     description:
       "Premier event planning and luxury birthday decoration services in Islamabad and Rawalpindi. Custom 3D backdrops, balloon architecture, cakes, and turnkey event coordination.",
     url: APP_BASE_URL,
-    logo: `${APP_BASE_URL}/brand/website logo no bg.png`,
+    logo: `${APP_BASE_URL}/brand/website logo.png`,
     image: `${APP_BASE_URL}/images/hero/hero_birthday_lawn.jpg`,
     telephone: "+923160513841",
     email: "info@areventsco.com",
