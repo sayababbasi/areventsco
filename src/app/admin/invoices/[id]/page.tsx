@@ -296,7 +296,7 @@ export default function AdminInvoiceDetailPage() {
                 AR EVENTS CO.
               </h2>
               <p className="text-xs font-medium text-brand-navy-600 mt-1">
-                Islamabad & Rawalpindi's Premier Birthday & Event Planners
+                Islamabad &amp; Rawalpindi&apos;s Premier Birthday &amp; Event Planners
               </p>
               <div className="text-xs text-brand-navy-500 mt-1">
                 Phone: +92 316 0513841 • Email: info@areventsco.com • Web: areventsco.com

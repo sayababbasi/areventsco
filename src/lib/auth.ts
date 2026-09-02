@@ -97,7 +97,7 @@ export function verifySessionToken(token: string): SessionUser | null {
 export async function getAuthSession(): Promise<SessionUser | null> {
   try {
     const { cookies } = await import("next/headers");
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("ar_session")?.value;
     if (!token) return null;
     return verifySessionToken(token);
