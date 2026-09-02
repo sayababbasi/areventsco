@@ -2,12 +2,23 @@ import { NextResponse } from "next/server";
 import { bookingCreateSchema } from "@/lib/validation/booking.schema";
 import { BookingService } from "@/server/services/booking.service";
 import { prisma } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
+    // Basic IP-based rate limiting: max 3 booking requests per 10 minutes
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = await rateLimit(`booking_${ip}`, 3, 10 * 60 * 1000);
+    if (!rl.success) {
+      return NextResponse.json(
+        { success: false, error: { code: "RATE_LIMIT_EXCEEDED", message: "Too many booking requests. Try again later." } },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const validated = bookingCreateSchema.parse(body);
 
