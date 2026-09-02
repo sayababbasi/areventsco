@@ -17,6 +17,10 @@ import {
   Eye,
   Wand2,
   PartyPopper,
+  Cake,
+  Smile,
+  Users,
+  Award
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
 import { getSafeThemes, getSafePackages, getSafeReviews, getSafeFaqs } from "@/lib/data-fallback";
@@ -127,23 +131,6 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {/* Trust Stats */}
-              <div className="pt-6 grid grid-cols-3 gap-4 border-t border-brand-warm-200 text-left">
-                <div>
-                  <p className="text-2xl sm:text-3xl font-bold text-brand-navy-900 font-serif">500+</p>
-                  <p className="text-xs sm:text-sm text-brand-navy-600">Events Styled</p>
-                </div>
-                <div>
-                  <p className="text-2xl sm:text-3xl font-bold text-brand-navy-900 font-serif flex items-center">
-                    4.9 <Star className="w-4 h-4 text-brand-gold-500 fill-brand-gold-500 ml-1" />
-                  </p>
-                  <p className="text-xs sm:text-sm text-brand-navy-600">Client Rating</p>
-                </div>
-                <div>
-                  <p className="text-2xl sm:text-3xl font-bold text-brand-navy-900 font-serif">100%</p>
-                  <p className="text-xs sm:text-sm text-brand-navy-600">On-Time Setup</p>
-                </div>
-              </div>
             </div>
 
             {/* Right Hero Image Card */}
@@ -173,6 +160,65 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 1.5 TRUST BANNER */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="space-y-8 sm:space-y-12">
+          {/* Top Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 divide-x divide-brand-warm-200">
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0 text-center sm:text-left">
+              <Cake className="w-10 h-10 text-brand-gold-600" />
+              <div>
+                <p className="text-3xl font-serif font-bold text-brand-navy-950">500+</p>
+                <p className="text-sm font-medium text-brand-navy-600">Parties Decorated</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0 text-center sm:text-left">
+              <Star className="w-10 h-10 text-brand-gold-600" />
+              <div>
+                <p className="text-3xl font-serif font-bold text-brand-navy-950">4.9<span className="text-xl">/5</span></p>
+                <p className="text-sm font-medium text-brand-navy-600">Happy Reviews</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0 text-center sm:text-left">
+              <Clock className="w-10 h-10 text-brand-gold-600" />
+              <div>
+                <p className="text-3xl font-serif font-bold text-brand-navy-950">100%</p>
+                <p className="text-sm font-medium text-brand-navy-600">On-Time Setup</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0 text-center sm:text-left">
+              <Smile className="w-10 h-10 text-brand-gold-600" />
+              <div>
+                <p className="text-3xl font-serif font-bold text-brand-navy-950">1000+</p>
+                <p className="text-sm font-medium text-brand-navy-600">Happy Customers</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Bottom Dark Pill */}
+          <div className="bg-brand-navy-950 rounded-3xl sm:rounded-full py-4 sm:py-5 px-6 sm:px-12 mx-auto max-w-5xl shadow-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-4 sm:divide-x divide-brand-navy-800 text-brand-gold-400">
+              <div className="flex items-center justify-center space-x-2.5">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base font-medium text-white">Made for You</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2.5 sm:pl-4">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base font-medium text-white">Top Quality</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2.5 sm:pl-4">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base font-medium text-white">Great Team</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2.5 sm:pl-4">
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base font-medium text-white">Best Memories</span>
               </div>
             </div>
           </div>
