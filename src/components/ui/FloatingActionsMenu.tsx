@@ -47,7 +47,7 @@ export function FloatingActionsMenu() {
           {/* Flyout Tooltip Left */}
           {activeItem === "support" && (
             <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 animate-in fade-in slide-in-from-right-2 duration-200 pointer-events-auto">
-              <div className="relative bg-brand-navy-950/98 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
+              <div className="relative bg-brand-navy-950/95 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
                 {/* Arrow Pointer */}
                 <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-brand-navy-950 border-t border-r border-brand-gold-500/40 rotate-45" />
 
@@ -154,7 +154,7 @@ export function FloatingActionsMenu() {
           {/* Flyout Tooltip Left */}
           {activeItem === "email" && (
             <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 animate-in fade-in slide-in-from-right-2 duration-200 pointer-events-auto">
-              <div className="relative bg-brand-navy-950/98 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
+              <div className="relative bg-brand-navy-950/95 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
                 {/* Arrow Pointer */}
                 <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-brand-navy-950 border-t border-r border-brand-gold-500/40 rotate-45" />
 
@@ -203,7 +203,7 @@ export function FloatingActionsMenu() {
           {/* Flyout Tooltip Left */}
           {activeItem === "whatsapp" && (
             <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 animate-in fade-in slide-in-from-right-2 duration-200 pointer-events-auto">
-              <div className="relative bg-brand-navy-950/98 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
+              <div className="relative bg-brand-navy-950/95 backdrop-blur-lg border border-brand-gold-500/40 rounded-xl p-3.5 shadow-2xl w-60 text-white">
                 {/* Arrow Pointer */}
                 <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-brand-navy-950 border-t border-r border-brand-gold-500/40 rotate-45" />
 
