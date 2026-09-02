@@ -13,34 +13,50 @@ export class BookingService {
   static async create(input: BookingCreateInputSchema) {
     const eventDate = new Date(input.eventDate);
 
-    // 1. Availability validation
-    const availability = await AvailabilityService.checkAvailability(
-      eventDate,
-      input.startTime,
-      input.city
-    );
+    // 1. Parallel execution of availability check, pricing, foreign keys resolution, and invoice count
+    const [availability, pricing, resolvedPackage, resolvedTheme, resolvedVenue, invoiceCount, existingUser] =
+      await Promise.all([
+        AvailabilityService.checkAvailability(eventDate, input.startTime, input.city),
+        PricingService.calculate({
+          packageId: input.packageId,
+          themeId: input.themeId,
+          addonIds: input.addonIds,
+          venueId: input.venueId,
+          city: input.city,
+          guestCount: input.guestCount,
+          couponCode: input.couponCode,
+        }),
+        input.packageId
+          ? prisma.package.findFirst({
+              where: { OR: [{ id: input.packageId }, { slug: input.packageId }] },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+        input.themeId
+          ? prisma.theme.findFirst({
+              where: { OR: [{ id: input.themeId }, { slug: input.themeId }, { title: input.themeId }] },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+        input.venueId
+          ? prisma.venue.findFirst({
+              where: { OR: [{ id: input.venueId }, { slug: input.venueId }] },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+        prisma.invoice.count(),
+        prisma.user.findUnique({
+          where: { email: input.email.toLowerCase().trim() },
+          include: { customerProfile: true },
+        }),
+      ]);
 
     if (!availability.isAvailable) {
       throw new Error(availability.reason || "The selected date is currently unavailable.");
     }
 
-    // 2. Authoritative Price calculation
-    const pricing = await PricingService.calculate({
-      packageId: input.packageId,
-      themeId: input.themeId,
-      addonIds: input.addonIds,
-      venueId: input.venueId,
-      city: input.city,
-      guestCount: input.guestCount,
-      couponCode: input.couponCode,
-    });
-
-    // 3. Find or Create User & Customer Profile
-    let user = await prisma.user.findUnique({
-      where: { email: input.email.toLowerCase().trim() },
-      include: { customerProfile: true },
-    });
-
+    // 2. Find or Create User & Customer Profile
+    let user = existingUser;
     if (!user) {
       const temporaryPassword = await hashPassword("Welcome@" + Math.floor(1000 + Math.random() * 9000));
       user = await prisma.user.create({
@@ -71,34 +87,9 @@ export class BookingService {
     }
 
     const reference = generateBookingReference();
-
-    // 4. Resolve Foreign Keys (Package, Theme, Venue)
-    let resolvedPackageId: string | null = null;
-    if (input.packageId) {
-      const p = await prisma.package.findFirst({
-        where: { OR: [{ id: input.packageId }, { slug: input.packageId }] },
-      });
-      if (p) resolvedPackageId = p.id;
-    }
-
-    let resolvedThemeId: string | null = null;
-    if (input.themeId) {
-      const t = await prisma.theme.findFirst({
-        where: { OR: [{ id: input.themeId }, { slug: input.themeId }, { title: input.themeId }] },
-      });
-      if (t) resolvedThemeId = t.id;
-    }
-
-    let resolvedVenueId: string | null = null;
-    if (input.venueId) {
-      const v = await prisma.venue.findFirst({
-        where: { OR: [{ id: input.venueId }, { slug: input.venueId }] },
-      });
-      if (v) resolvedVenueId = v.id;
-    }
-
-    // 5. Execute Transaction: Booking + Snapshot Items + Initial Invoice + Notification
-    const invoiceCount = await prisma.invoice.count();
+    const resolvedPackageId = resolvedPackage?.id || null;
+    const resolvedThemeId = resolvedTheme?.id || null;
+    const resolvedVenueId = resolvedVenue?.id || null;
     const invoiceNumber = generateInvoiceNumber(invoiceCount + 1);
 
     const booking = await prisma.$transaction(async (tx: any) => {

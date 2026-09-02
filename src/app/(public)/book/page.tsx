@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -18,6 +18,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
+import {
+  FALLBACK_PACKAGES,
+  FALLBACK_THEMES,
+  FALLBACK_VENUES,
+} from "@/lib/data-fallback";
 
 interface PriceResult {
   basePriceMinor: number;
@@ -29,6 +34,56 @@ interface PriceResult {
   depositRequiredMinor: number;
   appliedCoupon?: { code: string; discountMinor: number } | null;
 }
+
+const INITIAL_PACKAGES = FALLBACK_PACKAGES.map((p: any) => ({
+  id: p.id,
+  slug: p.slug,
+  title: p.title,
+  subtitle: p.subtitle,
+  priceMinor: p.basePriceMinor,
+  image: p.featuredImage || "/images/themes/theme_royal_midnight_prince.jpg",
+}));
+
+const INITIAL_THEMES = FALLBACK_THEMES.map((t: any) => ({
+  id: t.id,
+  slug: t.slug,
+  title: t.title,
+  category: t.category,
+  image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
+  colors: JSON.parse(t.colorPalette || "[]"),
+}));
+
+const INITIAL_VENUES = FALLBACK_VENUES.map((v: any) => ({
+  id: v.id,
+  slug: v.slug,
+  name: v.name,
+  city: v.city,
+  feeMinor: v.feeMinor,
+}));
+
+const INITIAL_ADDONS = [
+  {
+    id: "addon_photo_3hr",
+    slug: "pro-photography-3hr",
+    title: "3-Hour High-Res Event Photography",
+    priceMinor: 1500000,
+    desc: "Professional DSLR photographer capturing candid moments, portraits & cake cutting.",
+  },
+  {
+    id: "addon_marquee_numbers",
+    slug: "4ft-led-marquee-numbers",
+    title: "4-Foot LED Light-Up Marquee Numbers",
+    priceMinor: 600000,
+    desc: "Glowing warm-white marquee numbers representing child's age or initials.",
+  },
+  {
+    id: "addon_magic_show",
+    slug: "interactive-magic-show",
+    title: "Interactive Magic & Puppet Show",
+    priceMinor: 1000000,
+    desc: "45-minute interactive entertainment show for kids & family guests.",
+  },
+];
 
 export default function BookingPage() {
   const router = useRouter();
@@ -44,11 +99,11 @@ export default function BookingPage() {
   const [endTime, setEndTime] = useState("22:00");
   const [guestCount, setGuestCount] = useState(35);
 
-  const [selectedPackageId, setSelectedPackageId] = useState("kids-wonderland-birthday");
-  const [selectedThemeTitle, setSelectedThemeTitle] = useState("Lavender Dream & Purple Princess");
-  const [selectedVenueId, setSelectedVenueId] = useState("private-residence-venue");
+  const [selectedPackageId, setSelectedPackageId] = useState(INITIAL_PACKAGES[0]?.id || "kids-wonderland-birthday");
+  const [selectedThemeTitle, setSelectedThemeTitle] = useState(INITIAL_THEMES[0]?.title || "Lavender Dream & Purple Princess");
+  const [selectedVenueId, setSelectedVenueId] = useState(INITIAL_VENUES[0]?.id || "private-residence-venue");
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([
-    "pro-photography-3hr",
+    INITIAL_ADDONS[0]?.id || "addon_photo_3hr",
   ]);
 
   const [name, setName] = useState("");
@@ -58,14 +113,14 @@ export default function BookingPage() {
   const [specialRequests, setSpecialRequests] = useState("");
   const [couponCode, setCouponCode] = useState("");
 
-  // Live Catalog State from Database
-  const [packages, setPackages] = useState<any[]>([]);
-  const [themes, setThemes] = useState<any[]>([]);
-  const [addons, setAddons] = useState<any[]>([]);
-  const [venues, setVenues] = useState<any[]>([]);
-  const [isCatalogLoading, setIsCatalogLoading] = useState(true);
+  // Instant pre-populated catalog
+  const [packages, setPackages] = useState<any[]>(INITIAL_PACKAGES);
+  const [themes, setThemes] = useState<any[]>(INITIAL_THEMES);
+  const [addons, setAddons] = useState<any[]>(INITIAL_ADDONS);
+  const [venues, setVenues] = useState<any[]>(INITIAL_VENUES);
+  const [isCatalogLoading, setIsCatalogLoading] = useState(false);
 
-  // Fetch live database catalog
+  // Background refresh for live DB updates
   useEffect(() => {
     async function loadCatalog() {
       try {
@@ -107,34 +162,26 @@ export default function BookingPage() {
           setThemes(fetchedThemes);
           setAddons(fetchedAddons);
           setVenues(fetchedVenues);
-
-          // Default selections
-          if (fetchedPackages.length > 0) setSelectedPackageId(fetchedPackages[0].id);
-          if (fetchedThemes.length > 0) setSelectedThemeTitle(fetchedThemes[0].title);
-          if (fetchedVenues.length > 0) setSelectedVenueId(fetchedVenues[0].id);
-          if (fetchedAddons.length > 0) setSelectedAddonIds([fetchedAddons[0].id]);
         }
       } catch (err) {
-        console.error("Failed to load catalog:", err);
-      } finally {
-        setIsCatalogLoading(false);
+        console.warn("Using offline catalog fallback");
       }
     }
     loadCatalog();
   }, []);
 
-  // Pricing calculation helper
-  const calculateEstimatedTotal = (): PriceResult => {
-    const pkg = packages.find((p) => p.id === selectedPackageId);
-    const basePriceMinor = pkg ? pkg.priceMinor : 0;
+  // Instant Memoized Pricing Calculation
+  const pricing = useMemo((): PriceResult => {
+    const pkg = packages.find((p) => p.id === selectedPackageId || p.slug === selectedPackageId);
+    const basePriceMinor = pkg ? pkg.priceMinor : (packages[0]?.priceMinor || 0);
 
     let addonsTotalMinor = 0;
     for (const addonId of selectedAddonIds) {
-      const a = addons.find((item) => item.id === addonId);
+      const a = addons.find((item) => item.id === addonId || item.slug === addonId);
       if (a) addonsTotalMinor += a.priceMinor;
     }
 
-    const venue = venues.find((v) => v.id === selectedVenueId);
+    const venue = venues.find((v) => v.id === selectedVenueId || v.slug === selectedVenueId);
     const venueFeeMinor = venue ? venue.feeMinor : 0;
 
     const subtotalMinor = basePriceMinor + addonsTotalMinor + venueFeeMinor;
@@ -160,9 +207,7 @@ export default function BookingPage() {
       depositRequiredMinor,
       appliedCoupon,
     };
-  };
-
-  const pricing = calculateEstimatedTotal();
+  }, [selectedPackageId, selectedAddonIds, selectedVenueId, couponCode, packages, addons, venues]);
 
   // Handle Add-on toggling
   const toggleAddon = (id: string) => {

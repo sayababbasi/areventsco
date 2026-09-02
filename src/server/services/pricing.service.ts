@@ -15,97 +15,97 @@ export class PricingService {
     let discountMinor = 0;
     let appliedCoupon: { code: string; discountMinor: number } | null = null;
 
-    // 1. Base Package
-    if (input.packageId) {
-      const pkg = await prisma.package.findUnique({
-        where: { id: input.packageId, isActive: true },
-      });
+    // Parallel execution of all pricing lookups
+    const [pkg, addons, venue, coupon] = await Promise.all([
+      input.packageId
+        ? prisma.package.findFirst({
+            where: { OR: [{ id: input.packageId }, { slug: input.packageId }], isActive: true },
+          })
+        : Promise.resolve(null),
+      input.addonIds && input.addonIds.length > 0
+        ? prisma.addon.findMany({
+            where: {
+              OR: [{ id: { in: input.addonIds } }, { slug: { in: input.addonIds } }],
+              isActive: true,
+            },
+          })
+        : Promise.resolve([]),
+      input.venueId
+        ? prisma.venue.findFirst({
+            where: { OR: [{ id: input.venueId }, { slug: input.venueId }], isActive: true },
+          })
+        : Promise.resolve(null),
+      input.couponCode
+        ? prisma.coupon.findUnique({
+            where: { code: input.couponCode.toUpperCase().trim(), isActive: true },
+          })
+        : Promise.resolve(null),
+    ]);
 
-      if (pkg) {
-        basePriceMinor = pkg.basePriceMinor;
-        items.push({
-          itemType: "PACKAGE",
-          itemId: pkg.id,
-          name: pkg.title,
-          description: `Base Package (${pkg.guestCapacityMin}-${pkg.guestCapacityMax} guests, ${pkg.estimatedDurationHours} hours)`,
-          unitPriceMinor: pkg.basePriceMinor,
-          quantity: 1,
-          totalPriceMinor: pkg.basePriceMinor,
-          currency: pkg.currency,
-        });
-      }
+    // 1. Base Package
+    if (pkg) {
+      basePriceMinor = pkg.basePriceMinor;
+      items.push({
+        itemType: "PACKAGE",
+        itemId: pkg.id,
+        name: pkg.title,
+        description: `Base Package (${pkg.guestCapacityMin}-${pkg.guestCapacityMax} guests, ${pkg.estimatedDurationHours} hours)`,
+        unitPriceMinor: pkg.basePriceMinor,
+        quantity: 1,
+        totalPriceMinor: pkg.basePriceMinor,
+        currency: pkg.currency,
+      });
     }
 
     // 2. Add-ons
-    if (input.addonIds && input.addonIds.length > 0) {
-      const addons = await prisma.addon.findMany({
-        where: {
-          id: { in: input.addonIds },
-          isActive: true,
-        },
+    for (const addon of addons) {
+      addonsTotalMinor += addon.priceMinor;
+      items.push({
+        itemType: "ADDON",
+        itemId: addon.id,
+        name: addon.title,
+        description: addon.description ?? undefined,
+        unitPriceMinor: addon.priceMinor,
+        quantity: 1,
+        totalPriceMinor: addon.priceMinor,
+        currency: addon.currency,
       });
-
-      for (const addon of addons) {
-        addonsTotalMinor += addon.priceMinor;
-        items.push({
-          itemType: "ADDON",
-          itemId: addon.id,
-          name: addon.title,
-          description: addon.description ?? undefined,
-          unitPriceMinor: addon.priceMinor,
-          quantity: 1,
-          totalPriceMinor: addon.priceMinor,
-          currency: addon.currency,
-        });
-      }
     }
 
     // 3. Venue
-    if (input.venueId) {
-      const venue = await prisma.venue.findUnique({
-        where: { id: input.venueId, isActive: true },
+    if (venue && venue.feeMinor > 0) {
+      venueFeeMinor = venue.feeMinor;
+      items.push({
+        itemType: "VENUE_FEE",
+        itemId: venue.id,
+        name: `Venue Reservation: ${venue.name}`,
+        description: `${venue.city} - ${venue.address}`,
+        unitPriceMinor: venue.feeMinor,
+        quantity: 1,
+        totalPriceMinor: venue.feeMinor,
+        currency: venue.currency,
       });
-
-      if (venue && venue.feeMinor > 0) {
-        venueFeeMinor = venue.feeMinor;
-        items.push({
-          itemType: "VENUE_FEE",
-          itemId: venue.id,
-          name: `Venue Reservation: ${venue.name}`,
-          description: `${venue.city} - ${venue.address}`,
-          unitPriceMinor: venue.feeMinor,
-          quantity: 1,
-          totalPriceMinor: venue.feeMinor,
-          currency: venue.currency,
-        });
-      }
     }
 
     const subtotalMinor = basePriceMinor + addonsTotalMinor + venueFeeMinor + travelFeeMinor;
 
     // 4. Coupon Evaluation
-    if (input.couponCode) {
-      const coupon = await prisma.coupon.findUnique({
-        where: { code: input.couponCode.toUpperCase().trim(), isActive: true },
-      });
+    if (coupon) {
+      const isNotExpired = !coupon.expiresAt || new Date(coupon.expiresAt) > new Date();
+      const meetsMinimum = subtotalMinor >= coupon.minOrderMinor;
+      const withinMaxUses = coupon.usedCount < coupon.maxUses;
 
-      if (coupon) {
-        const isNotExpired = !coupon.expiresAt || new Date(coupon.expiresAt) > new Date();
-        const meetsMinimum = subtotalMinor >= coupon.minOrderMinor;
-        const withinMaxUses = coupon.usedCount < coupon.maxUses;
-
-        if (isNotExpired && meetsMinimum && withinMaxUses) {
-          if (coupon.discountType === "PERCENTAGE") {
-            discountMinor = Math.round((subtotalMinor * coupon.discountValue) / 100);
-          } else {
-            discountMinor = Math.min(coupon.discountValue, subtotalMinor);
-          }
-
-          appliedCoupon = {
-            code: coupon.code,
-            discountMinor,
-          };
+      if (isNotExpired && meetsMinimum && withinMaxUses) {
+        if (coupon.discountType === "PERCENTAGE") {
+          discountMinor = Math.round((subtotalMinor * coupon.discountValue) / 100);
+        } else {
+          discountMinor = Math.min(coupon.discountValue, subtotalMinor);
         }
+
+        appliedCoupon = {
+          code: coupon.code,
+          discountMinor,
+        };
       }
     }
 

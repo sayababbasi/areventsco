@@ -41,45 +41,67 @@ const FALLBACK_ADDONS = [
   },
 ];
 
+// In-memory catalog cache with 60s TTL
+let cachedCatalog: { data: any; expiresAt: number } | null = null;
+
 export async function GET() {
+  const now = Date.now();
+  if (cachedCatalog && cachedCatalog.expiresAt > now) {
+    return NextResponse.json(
+      { success: true, data: cachedCatalog.data, cached: true },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        },
+      }
+    );
+  }
+
   try {
-    const packages = await prisma.package.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    });
-
-    const themes = await prisma.theme.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    });
-
-    const addons = await prisma.addon.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    });
-
-    const venues = await prisma.venue.findMany({
-      where: { isActive: true },
-      orderBy: { name: "asc" },
-    });
+    const [packages, themes, addons, venues] = await Promise.all([
+      prisma.package.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.theme.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.addon.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.venue.findMany({
+        where: { isActive: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
 
     if (packages.length > 0 && themes.length > 0) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          packages: packages.map((p) => ({
-            ...p,
-            features: typeof p.features === "string" ? JSON.parse(p.features || "[]") : p.features,
-          })),
-          themes: themes.map((t) => ({
-            ...t,
-            colorPalette: typeof t.colorPalette === "string" ? JSON.parse(t.colorPalette || "[]") : t.colorPalette,
-            includedDecor: typeof t.includedDecor === "string" ? JSON.parse(t.includedDecor || "[]") : t.includedDecor,
-          })),
-          addons,
-          venues,
-        },
-      });
+      const data = {
+        packages: packages.map((p) => ({
+          ...p,
+          features: typeof p.features === "string" ? JSON.parse(p.features || "[]") : p.features,
+        })),
+        themes: themes.map((t) => ({
+          ...t,
+          colorPalette: typeof t.colorPalette === "string" ? JSON.parse(t.colorPalette || "[]") : t.colorPalette,
+          includedDecor: typeof t.includedDecor === "string" ? JSON.parse(t.includedDecor || "[]") : t.includedDecor,
+        })),
+        addons,
+        venues,
+      };
+
+      cachedCatalog = { data, expiresAt: now + 60_000 };
+
+      return NextResponse.json(
+        { success: true, data },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+          },
+        }
+      );
     }
   } catch (error: any) {
     console.warn("[CATALOG-API] Database unreachable. Serving offline fallback catalog:", error?.message);
