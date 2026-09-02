@@ -209,7 +209,7 @@ export default function AdminInvoicesPage() {
     e.preventDefault();
     if (!paymentModalInvoice) return;
     if (paymentAmountPKR <= 0) {
-      alert("Please enter a valid payment amount in PKR");
+      showToast("Please enter a valid payment amount in PKR");
       return;
     }
 
@@ -240,7 +240,7 @@ export default function AdminInvoicesPage() {
       setPaymentNotes("");
       fetchInvoices(pagination.page);
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to record payment.");
     } finally {
       setActionLoading(false);
     }

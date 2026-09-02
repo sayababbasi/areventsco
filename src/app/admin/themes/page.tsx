@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface ThemeItem {
   id: string;
@@ -174,20 +175,29 @@ export default function AdminThemesPage() {
     }
   };
 
-  const handleDeleteTheme = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete or deactivate "${title}"?`)) return;
+  const { confirm, alert, toast } = usePopup();
 
-    try {
-      const res = await fetch(`/api/admin/themes?id=${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (json.success) {
-        fetchThemes();
-      } else {
-        alert(json.error || "Failed to delete theme.");
-      }
-    } catch (err: any) {
-      alert(err.message || "Failed to delete theme.");
-    }
+  const handleDeleteTheme = (id: string, title: string) => {
+    confirm({
+      title: "Delete or Deactivate Theme",
+      message: `Are you sure you want to delete or deactivate "${title}"?`,
+      variant: "danger",
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/admin/themes?id=${id}`, { method: "DELETE" });
+          const json = await res.json();
+          if (json.success) {
+            toast("Theme removed successfully", "success");
+            fetchThemes();
+          } else {
+            alert({ title: "Operation Failed", message: json.error || "Failed to delete theme.", variant: "danger" });
+          }
+        } catch (err: any) {
+          alert({ title: "Error", message: err.message || "Failed to delete theme.", variant: "danger" });
+        }
+      },
+    });
   };
 
   const toggleActiveStatus = async (theme: ThemeItem) => {

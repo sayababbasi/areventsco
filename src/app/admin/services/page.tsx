@@ -198,7 +198,7 @@ export default function AdminServicesPage() {
         fetchServices();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update service.");
     }
   };
 
@@ -212,7 +212,7 @@ export default function AdminServicesPage() {
       setDeleteConfirmId(null);
       fetchServices();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete service.");
     }
   };
 

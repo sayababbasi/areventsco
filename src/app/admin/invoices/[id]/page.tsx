@@ -92,7 +92,7 @@ export default function AdminInvoiceDetailPage() {
   const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (paymentAmountPKR <= 0) {
-      alert("Payment amount must be greater than 0");
+      showToast("Payment amount must be greater than 0");
       return;
     }
 
@@ -122,7 +122,7 @@ export default function AdminInvoiceDetailPage() {
       setPaymentNotes("");
       fetchInvoice();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to record payment.");
     } finally {
       setPaymentLoading(false);
     }
@@ -153,7 +153,7 @@ export default function AdminInvoiceDetailPage() {
       setShowEditModal(false);
       fetchInvoice();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update invoice.");
     } finally {
       setEditLoading(false);
     }

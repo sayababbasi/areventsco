@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { Lock, Mail, ArrowRight, Loader2, Sparkles, ShieldCheck, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -144,16 +144,18 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleQuickDemoFill("admin@areventsco.com")}
-                className="p-1.5 rounded bg-brand-warm-100 text-brand-navy-900 font-medium hover:bg-brand-gold-100 text-left truncate"
+                className="p-2 rounded-xl bg-brand-warm-100 text-brand-navy-900 font-medium hover:bg-brand-gold-100 text-left truncate flex items-center gap-1.5 transition-colors"
               >
-                👑 Super Admin
+                <ShieldCheck className="w-3.5 h-3.5 text-brand-gold-600 flex-shrink-0" />
+                <span>Super Admin</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickDemoFill("fatima.z@gmail.com")}
-                className="p-1.5 rounded bg-brand-warm-100 text-brand-navy-900 font-medium hover:bg-brand-gold-100 text-left truncate"
+                className="p-2 rounded-xl bg-brand-warm-100 text-brand-navy-900 font-medium hover:bg-brand-gold-100 text-left truncate flex items-center gap-1.5 transition-colors"
               >
-                👤 Customer (Fatima)
+                <User className="w-3.5 h-3.5 text-brand-navy-600 flex-shrink-0" />
+                <span>Customer (Fatima)</span>
               </button>
             </div>
           </div>

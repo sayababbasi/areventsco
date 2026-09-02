@@ -193,7 +193,7 @@ export default function AdminVenuesPage() {
         fetchVenues();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update venue.");
     }
   };
 
@@ -207,7 +207,7 @@ export default function AdminVenuesPage() {
       setDeleteConfirmId(null);
       fetchVenues();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete venue.");
     }
   };
 

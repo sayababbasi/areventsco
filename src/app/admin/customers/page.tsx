@@ -236,7 +236,7 @@ export default function CustomersPage() {
       setDeleteConfirmId(null);
       fetchCustomers();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete customer.");
     }
   };
 

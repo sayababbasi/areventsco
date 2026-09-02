@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-warm-200 pb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-serif text-brand-navy-950 font-bold tracking-tight">
-            Welcome back, Sayab Abbasi 👋
+            Welcome back, Sayab Abbasi
           </h1>
           <p className="text-xs sm:text-sm text-brand-navy-600 mt-1">
             Here&apos;s what&apos;s happening with your birthday decoration & event business today.

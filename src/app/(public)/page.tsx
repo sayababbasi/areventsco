@@ -15,6 +15,8 @@ import {
   Heart,
   ChevronRight,
   Eye,
+  Wand2,
+  PartyPopper,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
 import { getSafeThemes, getSafePackages, getSafeReviews, getSafeFaqs } from "@/lib/data-fallback";
@@ -286,42 +288,47 @@ export default async function HomePage() {
                 step: "01",
                 title: "Discover",
                 desc: "Browse authentic setup photography and decoration concepts.",
-                icon: "✨",
+                icon: Sparkles,
               },
               {
                 step: "02",
                 title: "Choose Theme",
                 desc: "Select the aesthetic that matches your celebration vision.",
-                icon: "🎨",
+                icon: Palette,
               },
               {
                 step: "03",
                 title: "Customize",
                 desc: "Add cake, photography, marquee numbers, and bespoke colors.",
-                icon: "⚙️",
+                icon: Wand2,
               },
               {
                 step: "04",
                 title: "Book Online",
                 desc: "Pick your date, time, and twin-cities venue with instant pricing.",
-                icon: "📅",
+                icon: Calendar,
               },
               {
                 step: "05",
                 title: "Celebrate",
                 desc: "Our decor team sets up 3 hours early. You arrive and enjoy.",
-                icon: "🎉",
+                icon: PartyPopper,
               },
-            ].map((s, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 relative group hover:border-brand-gold-400 transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{s.icon}</span>
-                  <span className="text-xs font-bold text-brand-gold-600 font-mono">STEP {s.step}</span>
+            ].map((s, idx) => {
+              const IconComp = s.icon;
+              return (
+                <div key={idx} className="p-6 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 relative group hover:border-brand-gold-400 hover:shadow-md transition-all">
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-brand-gold-50 border border-brand-gold-200/80 flex items-center justify-center text-brand-gold-700 group-hover:bg-brand-gold-500 group-hover:text-brand-navy-950 transition-colors">
+                      <IconComp className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-brand-gold-600 font-mono">STEP {s.step}</span>
+                  </div>
+                  <h4 className="text-lg font-serif font-bold text-brand-navy-950">{s.title}</h4>
+                  <p className="text-xs text-brand-navy-600 leading-relaxed">{s.desc}</p>
                 </div>
-                <h4 className="text-lg font-serif font-bold text-brand-navy-950">{s.title}</h4>
-                <p className="text-xs text-brand-navy-600 leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

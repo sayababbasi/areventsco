@@ -14,6 +14,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface CouponItem {
   id: string;
@@ -86,14 +87,24 @@ export default function AdminCouponsPage() {
     }
   };
 
-  const handleDeleteCoupon = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this coupon?")) return;
-    try {
-      await fetch(`/api/admin/coupons?id=${id}`, { method: "DELETE" });
-      fetchCoupons();
-    } catch (err) {
-      console.error(err);
-    }
+  const { confirm, toast } = usePopup();
+
+  const handleDeleteCoupon = (id: string) => {
+    confirm({
+      title: "Delete Coupon",
+      message: "Are you sure you want to delete this coupon code?",
+      variant: "danger",
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          await fetch(`/api/admin/coupons?id=${id}`, { method: "DELETE" });
+          toast("Coupon deleted successfully", "success");
+          fetchCoupons();
+        } catch (err) {
+          console.error(err);
+        }
+      },
+    });
   };
 
   return (

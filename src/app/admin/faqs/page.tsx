@@ -157,7 +157,7 @@ export default function AdminFaqsPage() {
         fetchFaqs();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update FAQ.");
     }
   };
 
@@ -174,7 +174,7 @@ export default function AdminFaqsPage() {
         fetchFaqs();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to feature FAQ.");
     }
   };
 
@@ -188,7 +188,7 @@ export default function AdminFaqsPage() {
       setDeleteConfirmId(null);
       fetchFaqs();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete FAQ.");
     }
   };
 

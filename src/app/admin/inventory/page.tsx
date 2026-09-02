@@ -16,6 +16,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { formatPKR } from "@/lib/utils";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface InventoryItem {
   id: string;
@@ -152,18 +153,29 @@ export default function AdminInventoryPage() {
     }
   };
 
-  const handleDeleteItem = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to remove "${name}" from inventory?`)) return;
+  const { confirm, alert, toast } = usePopup();
 
-    try {
-      const res = await fetch(`/api/admin/inventory?id=${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (json.success) {
-        fetchInventory();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleDeleteItem = (id: string, name: string) => {
+    confirm({
+      title: "Remove Inventory Item",
+      message: `Are you sure you want to remove "${name}" from inventory?`,
+      variant: "danger",
+      confirmText: "Yes, Remove",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/admin/inventory?id=${id}`, { method: "DELETE" });
+          const json = await res.json();
+          if (json.success) {
+            toast("Inventory item removed", "success");
+            fetchInventory();
+          } else {
+            alert({ title: "Operation Failed", message: json.error || "Failed to remove item", variant: "danger" });
+          }
+        } catch (err: any) {
+          alert({ title: "Error", message: err.message || "Failed to remove item", variant: "danger" });
+        }
+      },
+    });
   };
 
   const filteredItems = items.filter((item) => {

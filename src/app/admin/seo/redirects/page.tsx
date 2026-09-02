@@ -153,7 +153,7 @@ export default function AdminSeoRedirectsPage() {
         fetchRedirects();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update redirect.");
     }
   };
 
@@ -169,7 +169,7 @@ export default function AdminSeoRedirectsPage() {
       setDeleteConfirmId(null);
       fetchRedirects();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete redirect.");
     }
   };
 

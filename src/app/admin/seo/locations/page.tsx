@@ -215,7 +215,7 @@ export default function AdminSeoLocationsPage() {
       setDeleteConfirmId(null);
       fetchLocations();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete location.");
     }
   };
 

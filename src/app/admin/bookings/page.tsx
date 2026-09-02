@@ -15,6 +15,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useRealtime } from "@/client/hooks/useRealtime";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface BookingRecord {
   id: string;
@@ -128,6 +129,8 @@ export default function AdminBookingsPage() {
     },
   });
 
+  const { alert } = usePopup();
+
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     // 1. Save previous status for optimistic rollback
     const previousBooking = bookings.find((b) => b.id === id);
@@ -153,7 +156,7 @@ export default function AdminBookingsPage() {
             prev.map((b) => (b.id === id ? { ...b, status: previousStatus } : b))
           );
         }
-        alert("Failed to update status on server. Rolled back.");
+        alert({ title: "Update Failed", message: "Failed to update status on server. Rolled back.", variant: "danger" });
       }
     } catch (err) {
       console.error(err);
@@ -162,7 +165,7 @@ export default function AdminBookingsPage() {
           prev.map((b) => (b.id === id ? { ...b, status: previousStatus } : b))
         );
       }
-      alert("Network error updating status. Rolled back.");
+      alert({ title: "Network Error", message: "Network error updating status. Rolled back.", variant: "danger" });
     } finally {
       setUpdatingId(null);
     }

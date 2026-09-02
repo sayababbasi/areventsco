@@ -187,7 +187,7 @@ export default function AdminAddonsPage() {
         fetchAddons();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update add-on.");
     }
   };
 
@@ -201,7 +201,7 @@ export default function AdminAddonsPage() {
       setDeleteConfirmId(null);
       fetchAddons();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete add-on.");
     }
   };
 

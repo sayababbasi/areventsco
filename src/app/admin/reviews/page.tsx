@@ -12,6 +12,7 @@ import {
   X,
   MapPin,
 } from "lucide-react";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface ReviewItem {
   id: string;
@@ -97,14 +98,24 @@ export default function AdminReviewsPage() {
     }
   };
 
-  const handleDeleteReview = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
-    try {
-      await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" });
-      fetchReviews();
-    } catch (err) {
-      console.error(err);
-    }
+  const { confirm, toast } = usePopup();
+
+  const handleDeleteReview = (id: string) => {
+    confirm({
+      title: "Delete Customer Review",
+      message: "Are you sure you want to delete this customer review?",
+      variant: "danger",
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE" });
+          toast("Review deleted successfully", "success");
+          fetchReviews();
+        } catch (err) {
+          console.error(err);
+        }
+      },
+    });
   };
 
   return (

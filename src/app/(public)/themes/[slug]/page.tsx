@@ -13,6 +13,10 @@ import {
   Layers,
   ChevronRight,
   MessageCircle,
+  Camera,
+  Lightbulb,
+  Video,
+  Cake,
 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { formatPKR } from "@/lib/utils";
@@ -641,29 +645,37 @@ export default async function ThemeDetailPage({ params }: { params: { slug: stri
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3">
-            <span className="text-2xl">📸</span>
+          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 group hover:border-brand-gold-400 hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold-50 border border-brand-gold-200/80 flex items-center justify-center text-brand-gold-700 group-hover:bg-brand-gold-500 group-hover:text-brand-navy-950 transition-colors">
+              <Camera className="w-5 h-5" />
+            </div>
             <h4 className="font-bold text-brand-navy-950 text-base">3-Hour Candid Photography</h4>
             <p className="text-xs text-brand-navy-600">50+ edited high-res digital photos with DSLR color grading.</p>
             <p className="text-sm font-bold text-brand-gold-700 pt-2 border-t border-brand-warm-100">+ PKR 15,000</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3">
-            <span className="text-2xl">🎂</span>
+          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 group hover:border-brand-gold-400 hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold-50 border border-brand-gold-200/80 flex items-center justify-center text-brand-gold-700 group-hover:bg-brand-gold-500 group-hover:text-brand-navy-950 transition-colors">
+              <Cake className="w-5 h-5" />
+            </div>
             <h4 className="font-bold text-brand-navy-950 text-base">Custom Themed Fondant Cake</h4>
             <p className="text-xs text-brand-navy-600">2-Tier (6 lbs) artisanal cake matching the theme color palette.</p>
             <p className="text-sm font-bold text-brand-gold-700 pt-2 border-t border-brand-warm-100">+ PKR 14,000</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3">
-            <span className="text-2xl">💡</span>
+          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 group hover:border-brand-gold-400 hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold-50 border border-brand-gold-200/80 flex items-center justify-center text-brand-gold-700 group-hover:bg-brand-gold-500 group-hover:text-brand-navy-950 transition-colors">
+              <Lightbulb className="w-5 h-5" />
+            </div>
             <h4 className="font-bold text-brand-navy-950 text-base">Giant 4ft Marquee Numbers</h4>
             <p className="text-xs text-brand-navy-600">Warm-white vintage bulb marquee lights for iconic birthday photos.</p>
             <p className="text-sm font-bold text-brand-gold-700 pt-2 border-t border-brand-warm-100">+ PKR 6,000</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3">
-            <span className="text-2xl">🎬</span>
+          <div className="p-5 rounded-2xl bg-white border border-brand-warm-200 shadow-sm space-y-3 group hover:border-brand-gold-400 hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold-50 border border-brand-gold-200/80 flex items-center justify-center text-brand-gold-700 group-hover:bg-brand-gold-500 group-hover:text-brand-navy-950 transition-colors">
+              <Video className="w-5 h-5" />
+            </div>
             <h4 className="font-bold text-brand-navy-950 text-base">Cinematic 4K Video Reel</h4>
             <p className="text-xs text-brand-navy-600">1-minute viral Instagram reel + 3-minute full 4K highlight video.</p>
             <p className="text-sm font-bold text-brand-gold-700 pt-2 border-t border-brand-warm-100">+ PKR 25,000</p>

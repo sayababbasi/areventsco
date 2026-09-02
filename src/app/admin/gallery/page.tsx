@@ -180,7 +180,7 @@ export default function AdminGalleryPage() {
         fetchAssets();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to update asset.");
     }
   };
 
@@ -197,7 +197,7 @@ export default function AdminGalleryPage() {
         fetchAssets();
       }
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to feature asset.");
     }
   };
 
@@ -211,7 +211,7 @@ export default function AdminGalleryPage() {
       setDeleteConfirmId(null);
       fetchAssets();
     } catch (err: any) {
-      alert(err.message);
+      showToast(err.message || "Failed to delete asset.");
     }
   };
 

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import ImageUploadDropzone from "@/components/admin/ImageUploadDropzone";
 import { formatPKR } from "@/lib/utils";
+import { usePopup } from "@/components/ui/ModalProvider";
 
 interface PackageItem {
   id: string;
@@ -181,20 +182,29 @@ export default function AdminPackagesPage() {
     }
   };
 
-  const handleDeletePackage = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete or deactivate "${title}"?`)) return;
+  const { confirm, alert, toast } = usePopup();
 
-    try {
-      const res = await fetch(`/api/admin/packages?id=${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (json.success) {
-        fetchPackages();
-      } else {
-        alert(json.error || "Failed to delete package.");
-      }
-    } catch (err: any) {
-      alert(err.message || "Failed to delete package.");
-    }
+  const handleDeletePackage = (id: string, title: string) => {
+    confirm({
+      title: "Delete or Deactivate Package",
+      message: `Are you sure you want to delete or deactivate "${title}"?`,
+      variant: "danger",
+      confirmText: "Yes, Delete",
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`/api/admin/packages?id=${id}`, { method: "DELETE" });
+          const json = await res.json();
+          if (json.success) {
+            toast("Package removed successfully", "success");
+            fetchPackages();
+          } else {
+            alert({ title: "Operation Failed", message: json.error || "Failed to delete package.", variant: "danger" });
+          }
+        } catch (err: any) {
+          alert({ title: "Error", message: err.message || "Failed to delete package.", variant: "danger" });
+        }
+      },
+    });
   };
 
   const filteredPackages = packages.filter(

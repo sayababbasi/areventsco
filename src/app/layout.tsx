@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { LocalBusinessJsonLd } from "@/components/seo/JsonLd";
+import { ModalProvider } from "@/components/ui/ModalProvider";
+import { NavigationProgress } from "@/components/ui/NavigationProgress";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://areventsco.com"),
@@ -73,8 +76,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-white text-brand-navy-950 antialiased selection:bg-brand-gold-200 selection:text-brand-navy-950">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <LocalBusinessJsonLd />
-        {children}
+        <ModalProvider>{children}</ModalProvider>
       </body>
     </html>
   );
