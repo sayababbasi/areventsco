@@ -89,9 +89,9 @@ export default async function HomePage() {
   }));
 
   return (
-    <div className="space-y-24 pb-20">
+    <div className="space-y-16 sm:space-y-24 pb-20">
       {/* 1. HERO SECTION */}
-      <section className="relative pt-8 pb-16 lg:pt-16 lg:pb-28 bg-gradient-to-b from-brand-warm-50 via-white to-white overflow-hidden">
+      <section className="relative pt-8 pb-6 lg:pt-14 lg:pb-10 bg-gradient-to-b from-brand-warm-50 via-white to-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
             {/* Left Content */}
@@ -167,7 +167,7 @@ export default async function HomePage() {
       </section>
 
       {/* 1.5 TRUST BANNER */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-2 -mt-10 sm:-mt-14 lg:-mt-16 relative z-10">
         <div className="space-y-8 sm:space-y-12">
           {/* Top Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 divide-x divide-brand-warm-200">
