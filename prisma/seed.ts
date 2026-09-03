@@ -367,6 +367,7 @@ async function main() {
       slug: "pro-photography-3hr",
       title: "3-Hour Candid Event Photography",
       category: "Media",
+      image: "/images/addons/addon_photography.jpg",
       description: "High-end DSLR coverage, portrait sessions, candid moments, and 50+ professionally color-graded photos delivered in an online private gallery.",
       priceMinor: 1500000, // PKR 15,000
     },
@@ -374,6 +375,7 @@ async function main() {
       slug: "cinematic-4k-video-reel",
       title: "Cinematic 4K Video Highlights & Reel",
       category: "Media",
+      image: "/images/addons/addon_videography.jpg",
       description: "1-minute social media highlight reel + 3-minute full 4K event summary video with licensed background score.",
       priceMinor: 2500000, // PKR 25,000
     },
@@ -381,6 +383,7 @@ async function main() {
       slug: "custom-fondant-cake-2tier",
       title: "2-Tier Themed Fondant Birthday Cake (6 lbs)",
       category: "Catering",
+      image: "/images/addons/addon_fondant_cake.jpg",
       description: "Artisanal customized cake crafted to match your chosen theme. Flavors: Belgian Chocolate Fudge, Red Velvet, or Salted Caramel.",
       priceMinor: 1400000, // PKR 14,000
     },
@@ -388,6 +391,7 @@ async function main() {
       slug: "giant-marquee-numbers",
       title: "Giant 4-Foot Light-Up Marquee Numbers",
       category: "Decor",
+      image: "/images/addons/addon_marquee_numbers.jpg",
       description: "Warm-white vintage bulb marquee numbers representing the birthday age. Iconic photo opportunity centerpiece.",
       priceMinor: 600000, // PKR 6,000
     },
@@ -395,6 +399,7 @@ async function main() {
       slug: "cold-spark-fireworks",
       title: "Cold Spark Pyro Machines (Set of 2)",
       category: "Effects",
+      image: "/images/addons/addon_cold_spark.jpg",
       description: "100% indoor-safe, smoke-free cold spark fountain machines for grand entrance and cake-cutting moments.",
       priceMinor: 800000, // PKR 8,000
     },
@@ -402,6 +407,7 @@ async function main() {
       slug: "kids-magic-puppet-show",
       title: "Kids Magic & Comedy Puppet Show (45 mins)",
       category: "Entertainment",
+      image: "/images/addons/addon_magic_show.jpg",
       description: "Professional interactive magic tricks, comedy puppet interactions, and audience participation that keeps children captivated.",
       priceMinor: 1200000, // PKR 12,000
     },
@@ -409,6 +415,7 @@ async function main() {
       slug: "live-cotton-candy-popcorn",
       title: "Live Popcorn & Cotton Candy Carts",
       category: "Catering",
+      image: "/images/addons/addon_cotton_candy.jpg",
       description: "Vintage carnival-style live counter with unlimited freshly made butter popcorn and colorful cotton candy for 2 hours.",
       priceMinor: 1000000, // PKR 10,000
     },

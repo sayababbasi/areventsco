@@ -60,11 +60,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8F9FD] text-brand-navy-950 font-sans selection:bg-brand-gold-500 selection:text-white">
+    <div className="h-screen max-h-screen overflow-hidden flex flex-col lg:flex-row bg-[#F8F9FD] text-brand-navy-950 font-sans selection:bg-brand-gold-500 selection:text-white">
       {/* ------------------------------------------------------------------ */}
       {/* LEFT PANEL: Visual Showcase & Brand Story                          */}
       {/* ------------------------------------------------------------------ */}
-      <div className="hidden lg:flex lg:w-1/2 min-h-screen relative overflow-hidden bg-brand-navy-950 p-10 xl:p-14 flex-col justify-between select-none">
+      <div className="hidden lg:flex lg:w-1/2 h-screen max-h-screen relative overflow-hidden bg-brand-navy-950 p-8 xl:p-12 flex-col justify-between select-none">
         {/* Ambient Luxury Background Image with Soft Glow Overlay */}
         <div className="absolute inset-0 z-0">
           <Image

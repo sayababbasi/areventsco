@@ -4,42 +4,10 @@ import {
   FALLBACK_PACKAGES,
   FALLBACK_THEMES,
   FALLBACK_VENUES,
+  FALLBACK_ADDONS,
 } from "@/lib/data-fallback";
 
 export const dynamic = "force-dynamic";
-
-const FALLBACK_ADDONS = [
-  {
-    id: "addon_photo_3hr",
-    slug: "pro-photography-3hr",
-    title: "3-Hour High-Res Event Photography",
-    category: "Media",
-    priceMinor: 1500000,
-    priceType: "FIXED",
-    description: "Professional DSLR photographer capturing candid moments, portraits & cake cutting.",
-    isActive: true,
-  },
-  {
-    id: "addon_marquee_numbers",
-    slug: "4ft-led-marquee-numbers",
-    title: "4-Foot LED Light-Up Marquee Numbers",
-    category: "Lighting",
-    priceMinor: 600000,
-    priceType: "FIXED",
-    description: "Glowing warm-white marquee numbers representing child's age or initials.",
-    isActive: true,
-  },
-  {
-    id: "addon_magic_show",
-    slug: "interactive-magic-show",
-    title: "Interactive Magic & Puppet Show",
-    category: "Entertainment",
-    priceMinor: 1000000,
-    priceType: "FIXED",
-    description: "45-minute interactive entertainment show for kids & family guests.",
-    isActive: true,
-  },
-];
 
 // In-memory catalog cache with 60s TTL
 let cachedCatalog: { data: any; expiresAt: number } | null = null;
@@ -88,7 +56,21 @@ export async function GET() {
           colorPalette: typeof t.colorPalette === "string" ? JSON.parse(t.colorPalette || "[]") : t.colorPalette,
           includedDecor: typeof t.includedDecor === "string" ? JSON.parse(t.includedDecor || "[]") : t.includedDecor,
         })),
-        addons,
+        addons: addons.map((a) => {
+          const s = (a.slug || a.id || "").toLowerCase();
+          let img = a.image;
+          if (!img || img.trim() === "") {
+            if (s.includes("photo")) img = "/images/addons/addon_photography.jpg";
+            else if (s.includes("video") || s.includes("cinematic") || s.includes("reel")) img = "/images/addons/addon_videography.jpg";
+            else if (s.includes("cake") || s.includes("fondant")) img = "/images/addons/addon_fondant_cake.jpg";
+            else if (s.includes("marquee") || s.includes("number") || s.includes("led")) img = "/images/addons/addon_marquee_numbers.jpg";
+            else if (s.includes("spark") || s.includes("pyro") || s.includes("firework")) img = "/images/addons/addon_cold_spark.jpg";
+            else if (s.includes("magic") || s.includes("puppet") || s.includes("show")) img = "/images/addons/addon_magic_show.jpg";
+            else if (s.includes("cotton") || s.includes("popcorn") || s.includes("cart")) img = "/images/addons/addon_cotton_candy.jpg";
+            else img = "/images/addons/addon_photography.jpg";
+          }
+          return { ...a, image: img };
+        }),
         venues,
       };
 

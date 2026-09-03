@@ -635,6 +635,107 @@ export async function getSafeServices(take?: number) {
   return take ? FALLBACK_SERVICES.slice(0, take) : FALLBACK_SERVICES;
 }
 
+export const FALLBACK_ADDONS = [
+  {
+    id: "addon_photo_3hr",
+    slug: "pro-photography-3hr",
+    title: "3-Hour Candid Event Photography",
+    category: "Media",
+    priceMinor: 1500000, // PKR 15,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_photography.jpg",
+    description: "High-end DSLR coverage, portrait sessions, candid moments, and 50+ professionally color-graded photos delivered in an online private gallery.",
+    isActive: true,
+    sortOrder: 1,
+  },
+  {
+    id: "addon_cinematic_video",
+    slug: "cinematic-4k-video-reel",
+    title: "Cinematic 4K Video Highlights & Reel",
+    category: "Media",
+    priceMinor: 2500000, // PKR 25,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_videography.jpg",
+    description: "1-minute social media highlight reel + 3-minute full 4K event summary video with licensed background score.",
+    isActive: true,
+    sortOrder: 2,
+  },
+  {
+    id: "addon_fondant_cake",
+    slug: "custom-fondant-cake-2tier",
+    title: "2-Tier Themed Fondant Birthday Cake (6 lbs)",
+    category: "Catering",
+    priceMinor: 1400000, // PKR 14,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_fondant_cake.jpg",
+    description: "Artisanal customized cake crafted to match your chosen theme. Flavors: Belgian Chocolate Fudge, Red Velvet, or Salted Caramel.",
+    isActive: true,
+    sortOrder: 3,
+  },
+  {
+    id: "addon_marquee_numbers",
+    slug: "giant-marquee-numbers",
+    title: "Giant 4-Foot Light-Up Marquee Numbers",
+    category: "Decor",
+    priceMinor: 600000, // PKR 6,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_marquee_numbers.jpg",
+    description: "Warm-white vintage bulb marquee numbers representing the birthday age. Iconic photo opportunity centerpiece.",
+    isActive: true,
+    sortOrder: 4,
+  },
+  {
+    id: "addon_cold_spark",
+    slug: "cold-spark-fireworks",
+    title: "Cold Spark Pyro Machines (Set of 2)",
+    category: "Effects",
+    priceMinor: 800000, // PKR 8,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_cold_spark.jpg",
+    description: "100% indoor-safe, smoke-free cold spark fountain machines for grand entrance and cake-cutting moments.",
+    isActive: true,
+    sortOrder: 5,
+  },
+  {
+    id: "addon_magic_show",
+    slug: "kids-magic-puppet-show",
+    title: "Kids Magic & Comedy Puppet Show (45 mins)",
+    category: "Entertainment",
+    priceMinor: 1200000, // PKR 12,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_magic_show.jpg",
+    description: "Professional interactive magic tricks, comedy puppet interactions, and audience participation that keeps children captivated.",
+    isActive: true,
+    sortOrder: 6,
+  },
+  {
+    id: "addon_cotton_candy",
+    slug: "live-cotton-candy-popcorn",
+    title: "Live Popcorn & Cotton Candy Carts",
+    category: "Catering",
+    priceMinor: 1000000, // PKR 10,000
+    priceType: "FIXED",
+    image: "/images/addons/addon_cotton_candy.jpg",
+    description: "Vintage carnival-style live counter with unlimited freshly made butter popcorn and colorful cotton candy for 2 hours.",
+    isActive: true,
+    sortOrder: 7,
+  },
+];
+
+export async function getSafeAddons(take?: number) {
+  try {
+    const dbAddons = await prisma.addon.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+      ...(take ? { take } : {}),
+    });
+    if (dbAddons && dbAddons.length > 0) return dbAddons;
+  } catch (err: any) {
+    console.warn(`[DATA-FALLBACK] Addon query offline or unavailable (${err?.message || "connection error"}). Serving fallback addons.`);
+  }
+  return take ? FALLBACK_ADDONS.slice(0, take) : FALLBACK_ADDONS;
+}
+
 export async function getSafeVenues(take?: number) {
   try {
     const dbVenues = await prisma.venue.findMany({

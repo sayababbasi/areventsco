@@ -22,6 +22,7 @@ import {
   FALLBACK_PACKAGES,
   FALLBACK_THEMES,
   FALLBACK_VENUES,
+  FALLBACK_ADDONS,
 } from "@/lib/data-fallback";
 
 interface PriceResult {
@@ -50,7 +51,7 @@ const INITIAL_THEMES = FALLBACK_THEMES.map((t: any) => ({
   title: t.title,
   category: t.category,
   image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
-  colors: JSON.parse(t.colorPalette || "[]"),
+  colors: typeof t.colorPalette === "string" ? JSON.parse(t.colorPalette || "[]") : t.colorPalette,
 }));
 
 const INITIAL_VENUES = FALLBACK_VENUES.map((v: any) => ({
@@ -61,29 +62,14 @@ const INITIAL_VENUES = FALLBACK_VENUES.map((v: any) => ({
   feeMinor: v.feeMinor,
 }));
 
-const INITIAL_ADDONS = [
-  {
-    id: "addon_photo_3hr",
-    slug: "pro-photography-3hr",
-    title: "3-Hour High-Res Event Photography",
-    priceMinor: 1500000,
-    desc: "Professional DSLR photographer capturing candid moments, portraits & cake cutting.",
-  },
-  {
-    id: "addon_marquee_numbers",
-    slug: "4ft-led-marquee-numbers",
-    title: "4-Foot LED Light-Up Marquee Numbers",
-    priceMinor: 600000,
-    desc: "Glowing warm-white marquee numbers representing child's age or initials.",
-  },
-  {
-    id: "addon_magic_show",
-    slug: "interactive-magic-show",
-    title: "Interactive Magic & Puppet Show",
-    priceMinor: 1000000,
-    desc: "45-minute interactive entertainment show for kids & family guests.",
-  },
-];
+const INITIAL_ADDONS = FALLBACK_ADDONS.map((a: any) => ({
+  id: a.id,
+  slug: a.slug,
+  title: a.title,
+  priceMinor: a.priceMinor,
+  desc: a.description,
+  image: a.image || "/images/addons/addon_photography.jpg",
+}));
 
 export default function BookingPage() {
   const router = useRouter();
@@ -143,13 +129,28 @@ export default function BookingPage() {
             image: t.heroImage || "/images/themes/theme_lavender_dream.jpg",
             colors: t.colorPalette || ["#9370DB", "#E6E6FA"],
           }));
-          const fetchedAddons = json.data.addons.map((a: any) => ({
-            id: a.id,
-            slug: a.slug,
-            title: a.title,
-            priceMinor: a.priceMinor,
-            desc: a.description,
-          }));
+          const fetchedAddons = json.data.addons.map((a: any) => {
+            const s = (a.slug || a.id || "").toLowerCase();
+            let img = a.image;
+            if (!img || img.trim() === "") {
+              if (s.includes("photo")) img = "/images/addons/addon_photography.jpg";
+              else if (s.includes("video") || s.includes("cinematic") || s.includes("reel")) img = "/images/addons/addon_videography.jpg";
+              else if (s.includes("cake") || s.includes("fondant")) img = "/images/addons/addon_fondant_cake.jpg";
+              else if (s.includes("marquee") || s.includes("number") || s.includes("led")) img = "/images/addons/addon_marquee_numbers.jpg";
+              else if (s.includes("spark") || s.includes("pyro") || s.includes("firework")) img = "/images/addons/addon_cold_spark.jpg";
+              else if (s.includes("magic") || s.includes("puppet") || s.includes("show")) img = "/images/addons/addon_magic_show.jpg";
+              else if (s.includes("cotton") || s.includes("popcorn") || s.includes("cart")) img = "/images/addons/addon_cotton_candy.jpg";
+              else img = "/images/addons/addon_photography.jpg";
+            }
+            return {
+              id: a.id,
+              slug: a.slug,
+              title: a.title,
+              priceMinor: a.priceMinor,
+              desc: a.description || a.desc,
+              image: img,
+            };
+          });
           const fetchedVenues = json.data.venues.map((v: any) => ({
             id: v.id,
             slug: v.slug,
@@ -500,14 +501,29 @@ export default function BookingPage() {
                       <div
                         key={idx}
                         onClick={() => setSelectedThemeTitle(th.title)}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all flex items-center justify-between ${
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
                           selectedThemeTitle === th.title
-                            ? "border-brand-gold-500 bg-brand-gold-50/40"
-                            : "border-brand-warm-200 hover:border-brand-warm-300"
+                            ? "border-brand-gold-500 bg-brand-gold-50/40 shadow-sm ring-1 ring-brand-gold-400/30"
+                            : "border-brand-warm-200 hover:border-brand-warm-300 bg-white"
                         }`}
                       >
-                        <span className="text-xs font-medium text-brand-navy-900">{th.title}</span>
-                        <div className="flex space-x-1">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-brand-warm-100 border border-brand-warm-200">
+                            <Image
+                              src={th.image || "/images/themes/theme_lavender_dream.jpg"}
+                              alt={th.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-brand-navy-950 truncate">{th.title}</h4>
+                            <span className="text-[10px] font-semibold text-brand-gold-700 uppercase tracking-wider">
+                              {th.category || "Theme"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-1 pl-2 flex-shrink-0">
                           {th.colors.map((c: string, cIdx: number) => (
                             <span
                               key={cIdx}
@@ -590,25 +606,33 @@ export default function BookingPage() {
                         <div
                           key={a.id}
                           onClick={() => toggleAddon(a.id)}
-                          className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-3 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between gap-3 ${
                             isSelected
-                              ? "border-brand-gold-500 bg-brand-gold-50/30"
-                              : "border-brand-warm-200 hover:border-brand-warm-300"
+                              ? "border-brand-gold-500 bg-brand-gold-50/30 shadow-sm ring-1 ring-brand-gold-400/20"
+                              : "border-brand-warm-200 hover:border-brand-warm-300 bg-white"
                           }`}
                         >
-                          <div className="flex items-start space-x-3">
+                          <div className="flex items-center space-x-3 min-w-0">
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => {}}
-                              className="mt-0.5 rounded text-brand-gold-600 focus:ring-brand-gold-400"
+                              className="w-4 h-4 rounded text-brand-gold-600 focus:ring-brand-gold-400 border-brand-warm-300 flex-shrink-0"
                             />
-                            <div>
+                            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0 bg-brand-warm-100 border border-brand-warm-200">
+                              <Image
+                                src={a.image || "/images/addons/addon_photography.jpg"}
+                                alt={a.title}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="min-w-0">
                               <p className="text-xs font-bold text-brand-navy-950">{a.title}</p>
-                              <p className="text-[11px] text-brand-navy-600">{a.desc}</p>
+                              <p className="text-[11px] text-brand-navy-600 line-clamp-2 leading-relaxed">{a.desc}</p>
                             </div>
                           </div>
-                          <span className="text-xs font-bold text-brand-gold-700 ml-4 flex-shrink-0">
+                          <span className="text-xs font-bold text-brand-gold-700 ml-2 flex-shrink-0 whitespace-nowrap">
                             +{formatPKR(a.priceMinor)}
                           </span>
                         </div>
