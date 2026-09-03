@@ -5,21 +5,35 @@ import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting: max 3 registration attempts per 30 minutes per IP
+    // Rate limiting: max 10 registration attempts per 15 minutes per IP
     const ip = req.headers.get("x-forwarded-for") || "unknown";
-    const rl = await rateLimit(`register_${ip}`, 3, 30 * 60 * 1000);
+    const rl = await rateLimit(`register_${ip}`, 10, 15 * 60 * 1000);
     if (!rl.success) {
       return NextResponse.json(
-        { success: false, error: { code: "RATE_LIMIT_EXCEEDED", message: "Too many registration attempts. Try again later." } },
+        { success: false, error: { code: "RATE_LIMIT_EXCEEDED", message: "Too many registration attempts. Please try again in a few minutes." } },
         { status: 429 }
       );
     }
 
     const { name, email, phone, password, city, address } = await req.json();
 
-    if (!name || !email || !password) {
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
       return NextResponse.json(
-        { success: false, error: { code: "VALIDATION_ERROR", message: "Name, email, and password are required" } },
+        { success: false, error: { code: "VALIDATION_ERROR", message: "Please enter your full name (minimum 2 characters)." } },
+        { status: 400 }
+      );
+    }
+
+    if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return NextResponse.json(
+        { success: false, error: { code: "VALIDATION_ERROR", message: "Please provide a valid email address." } },
+        { status: 400 }
+      );
+    }
+
+    if (!password || typeof password !== "string" || password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: { code: "VALIDATION_ERROR", message: "Password must be at least 6 characters long." } },
         { status: 400 }
       );
     }

@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import {
   Lock,
   Mail,
-  ArrowRight,
   Loader2,
   Calendar,
   Users,
@@ -18,6 +17,7 @@ import {
   Sun,
   Moon,
   LogIn,
+  Sparkles,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -60,22 +60,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8F9FD] text-brand-navy-950 font-sans">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8F9FD] text-brand-navy-950 font-sans selection:bg-brand-gold-500 selection:text-white">
       {/* ------------------------------------------------------------------ */}
       {/* LEFT PANEL: Visual Showcase & Brand Story                          */}
       {/* ------------------------------------------------------------------ */}
       <div className="hidden lg:flex lg:w-1/2 min-h-screen relative overflow-hidden bg-brand-navy-950 p-10 xl:p-14 flex-col justify-between select-none">
-        {/* Ambient Luxury Background Image with Soft Parallax Overlay */}
+        {/* Ambient Luxury Background Image with Soft Glow Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/hero/hero_birthday_lawn.jpg"
             alt="AR Events Co. Luxury Setup"
             fill
             priority
-            className="object-cover object-center opacity-30 mix-blend-luminosity scale-105"
+            className="object-cover object-center opacity-40 mix-blend-luminosity scale-105 transition-transform duration-1000 ease-out"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-brand-navy-950/90 to-black/95" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(212,175,55,0.15),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(212,175,55,0.2),transparent_60%)]" />
         </div>
 
         {/* Top Brand Logo */}
@@ -85,7 +85,7 @@ export default function LoginPage() {
               <Image
                 src="/brand/website logo no bg.png"
                 alt="AR Events Co."
-                width={200}
+                width={210}
                 height={70}
                 className="h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
@@ -97,7 +97,12 @@ export default function LoginPage() {
         </div>
 
         {/* Middle Value Proposition & Features */}
-        <div className="relative z-10 my-auto py-8 max-w-lg">
+        <div className="relative z-10 my-auto py-6 max-w-lg">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/25 text-amber-300 text-xs font-semibold mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Islamabad &amp; Rawalpindi Premier Events</span>
+          </div>
+
           <h2 className="text-3xl xl:text-4xl font-extrabold text-white leading-tight font-serif">
             Let&apos;s create{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200">
@@ -109,7 +114,7 @@ export default function LoginPage() {
           </p>
 
           {/* 3 Feature Cards */}
-          <div className="space-y-3 mt-8">
+          <div className="space-y-3 mt-6">
             <div className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] backdrop-blur-md rounded-2xl p-3.5 flex items-center gap-3.5 transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 flex-shrink-0">
                 <Calendar className="w-5 h-5" />
@@ -127,7 +132,7 @@ export default function LoginPage() {
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs font-semibold text-white">Client & Booking Overview</h3>
+                <h3 className="text-xs font-semibold text-white">Client &amp; Booking Overview</h3>
                 <p className="text-[11px] text-brand-navy-300">
                   Keep track of clients, bookings and payments.
                 </p>
@@ -139,7 +144,7 @@ export default function LoginPage() {
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs font-semibold text-white">Insights & Reports</h3>
+                <h3 className="text-xs font-semibold text-white">Insights &amp; Reports</h3>
                 <p className="text-[11px] text-brand-navy-300">
                   Get real-time insights and grow your business.
                 </p>
@@ -342,15 +347,15 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Registration / Contact Administrator */}
+          {/* Direct Sign Up Link */}
           <div className="text-center pt-5 mt-5 border-t border-gray-100">
             <p className="text-xs text-gray-500">
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="text-[#6342E8] font-semibold hover:underline transition-colors"
+                className="text-[#6342E8] font-bold hover:underline transition-colors ml-1"
               >
-                Contact your administrator
+                Sign Up
               </Link>
             </p>
           </div>
